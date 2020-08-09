@@ -62,20 +62,45 @@ body {
 /* Меню авторизации */
 
 .auth-menu {
-  position: absolute;
-  left: 50%;
-  top: 50%;
+  margin-top: 40vh;
 
   display: flex;
   flex-direction: column;
-
-  transform: translate(-50%, -50%);
+  align-items: center;
 }
 
 .auth-menu__button {
+  width: 200px;
   margin-bottom: 10px;
 }
 
 .auth-menu__button:last-child {
   margin-bottom: 0;
+}
+
+/* Форма */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 200px;
+  padding: 15px;
+  border-radius: 10px;
+
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.form__label,
+.form__input {
+  margin-bottom: 5px;
+}
+
+.form__label {
+  color: #ffffff;
+}
+
+.form--centered {
+  margin: 30vh auto 0;
 }
