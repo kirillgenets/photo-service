@@ -1,0 +1,81 @@
+/* Общие стили */
+
+body {
+  margin: 0;
+  padding: 0;
+
+  font-family: "Tahoma", Arial, sans-serif;
+  font-size: 14px;
+
+  background-color: #0a9b6f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Кнопки */
+
+.button {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+
+  font-size: 14px;
+  color: #000000;
+  text-align: center;
+  text-decoration: none;
+
+  background-color: #ffffff;
+
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.button:hover {
+  opacity: 0.8;
+}
+
+.button:active {
+  opacity: 0.5;
+}
+
+.button--bigger {
+  font-size: 18px;
+}
+
+/* Шапка */
+
+.header {
+  padding: 15px;
+
+  background-color: #076d4e;
+}
+
+.header__title {
+  font-size: 25px;
+  font-weight: normal;
+  text-align: center;
+  color: #ffffff;
+}
+
+/* Меню авторизации */
+
+.auth-menu {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  display: flex;
+  flex-direction: column;
+
+  transform: translate(-50%, -50%);
+}
+
+.auth-menu__button {
+  margin-bottom: 10px;
+}
+
+.auth-menu__button:last-child {
+  margin-bottom: 0;
+}
