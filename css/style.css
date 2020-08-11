@@ -17,7 +17,7 @@ body {
 /* Кнопки */
 
 .button {
-  padding: 10px;
+  padding: 5px;
   border: none;
   border-radius: 5px;
 
@@ -41,7 +41,15 @@ body {
 }
 
 .button--bigger {
+  padding: 10px;
+
   font-size: 18px;
+}
+
+.button--smaller {
+  padding: 3px;
+
+  font-size: 12px;
 }
 
 /* Шапка */
@@ -103,4 +111,46 @@ body {
 
 .form--centered {
   margin: 30vh auto 0;
+}
+
+/* Фотографии */
+
+.photos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.photos__upload-button {
+  margin: 10px 0;
+}
+
+.photos__list {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.photo {
+  display: flex;
+  flex-direction: column;
+
+  width: 180px;
+  margin-bottom: 15px;
+}
+
+.photo * {
+  margin-bottom: 5px;
+}
+
+.photo *:last-child {
+  margin-bottom: 0;
+}
+
+.photo__thumbnail {
+  height: 180px;
+}
+
+.photo__title {
+  text-align: center;
 }

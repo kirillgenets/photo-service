@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Фотосервис | Главная</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Шапка -->
+    <header class="header">
+      <h1 class="header__title">Фотосервис</h1>
+    </header>
+    <!-- Конец шапки -->
+    <main>
+      <div class="photos photos">
+        <button class="photos__upload-button button button--bigger">
+          Загрузить фотографию
+        </button>
+      </div>
+      <div class="photos__list"></div>
+    </main>
+    <!-- Шаблон фотографии -->
+    <template id="photo">
+      <div class="photo">
+        <img
+          class="photo__thumbnail"
+          src=""
+          alt="Случайная фотография"
+          width="180"
+          height="180"
+        />
+        <input type="text" class="photo__title" disabled />
+        <button class="photo__button photo__button--update button--smaller">
+          Редактировать
+        </button>
+        <button class="photo__button photo__button--delete button--smaller">
+          Удалить
+        </button>
+      </div>
+    </template>
+
+    <script src="js/index-auth.js"></script>
+  </body>
+</html>
