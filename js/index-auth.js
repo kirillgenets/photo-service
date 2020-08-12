@@ -50,6 +50,10 @@ const renderAllPhotos = () => {
     console.log("handlePhotoEditButtonClick -> evt", evt);
   };
 
+  const handlePhotoShareButtonClick = (evt) => {
+    console.log("handlePhotoShareButtonClick -> evt", evt);
+  };
+
   const handlePhotoTitleChange = (evt) => {
     console.log("handlePhotoTitleChange -> evt", evt);
   };
@@ -61,6 +65,9 @@ const renderAllPhotos = () => {
     element
       .querySelector(".photo__button--edit")
       .addEventListener("click", handlePhotoEditButtonClick);
+    element
+      .querySelector(".photo__button--share")
+      .addEventListener("click", handlePhotoShareButtonClick);
     element
       .querySelector(".photo__title")
       .addEventListener("change", handlePhotoTitleChange);
