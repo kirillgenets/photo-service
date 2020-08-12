@@ -121,8 +121,16 @@ body {
   align-items: center;
 }
 
-.photos__upload-button {
+.photos__upload-button-label {
   margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+
+  background-color: #ffffff;
+}
+
+.photos__upload-button {
+  display: none;
 }
 
 .photos__list {

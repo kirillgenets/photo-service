@@ -14,9 +14,12 @@
     <!-- Конец шапки -->
     <main>
       <div class="photos photos">
-        <button class="photos__upload-button button button--bigger">
-          Загрузить фотографию
-        </button>
+        <label
+          class="photos__upload-button-label button button-bigger"
+          for="photo-input"
+          >Загрузить фотографию</label
+        >
+        <input class="photos__upload-button" type="file" id="photo-input" />
       </div>
       <div class="photos__list"></div>
     </main>
@@ -30,7 +33,7 @@
           width="180"
           height="180"
         />
-        <input type="text" class="photo__title" disabled />
+        <input class="photo__title" type="text" disabled />
         <button class="photo__button photo__button--edit button--smaller">
           Редактировать
         </button>
