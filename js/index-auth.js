@@ -42,6 +42,23 @@ const photosListWrapper = document.querySelector(".photos__list");
 const renderAllPhotos = () => {
   const photosListWrapperFragment = document.createDocumentFragment();
 
+  const handlePhotoDeleteButtonClick = (evt) => {
+    console.log("handlePhotoDeleteButtonClick -> evt", evt);
+  };
+
+  const handlePhotoEditButtonClick = (evt) => {
+    console.log("handlePhotoEditButtonClick -> evt", evt);
+  };
+
+  const setPhotoEventListeners = (element) => {
+    element
+      .querySelector(".photo__button--delete")
+      .addEventListener("click", handlePhotoDeleteButtonClick);
+    element
+      .querySelector(".photo__button--edit")
+      .addEventListener("click", handlePhotoEditButtonClick);
+  };
+
   photosListWrapperFragment.append(
     ...PHOTOS_DATA.map(({ name, url }) => {
       const wrapper = photoTemplate.content.cloneNode(true);
@@ -52,6 +69,8 @@ const renderAllPhotos = () => {
       thumbnailElement.alt = name;
 
       titleElement.value = name;
+
+      setPhotoEventListeners(wrapper);
 
       return wrapper;
     })
