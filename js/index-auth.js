@@ -50,6 +50,10 @@ const renderAllPhotos = () => {
     console.log("handlePhotoEditButtonClick -> evt", evt);
   };
 
+  const handlePhotoTitleChange = (evt) => {
+    console.log("handlePhotoTitleChange -> evt", evt);
+  };
+
   const setPhotoEventListeners = (element) => {
     element
       .querySelector(".photo__button--delete")
@@ -57,6 +61,9 @@ const renderAllPhotos = () => {
     element
       .querySelector(".photo__button--edit")
       .addEventListener("click", handlePhotoEditButtonClick);
+    element
+      .querySelector(".photo__title")
+      .addEventListener("change", handlePhotoTitleChange);
   };
 
   photosListWrapperFragment.append(
