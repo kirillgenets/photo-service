@@ -13,7 +13,27 @@
     </header>
     <!-- Конец шапки -->
     <main>
-      <div class="photos photos">
+      <div class="share-modal modal">
+        <h2>Поделиться фотографией</h2>
+        <form class="share-modal__form" action="">
+          <input class="share-modal__search" type="text" />
+          <div class="share-modal__user">
+            <label class="share-modal__user-name" for="share-user"
+              >Василий Петров</label
+            >
+            <input
+              class="share-modal__user-checkbox"
+              type="checkbox"
+              name="share-user"
+              id="share-user"
+            />
+          </div>
+          <button class="share-modal__submit button button-smaller">
+            Поделиться
+          </button>
+        </form>
+      </div>
+      <div class="photos">
         <label
           class="photos__upload-button-label button button-bigger"
           for="photo-input"

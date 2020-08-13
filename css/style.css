@@ -179,3 +179,17 @@ body {
 
   transform: translate(-50%, -50%);
 }
+
+/* Шаринг фотографий */
+
+.share-modal {
+  text-align: center;
+}
+
+.share-modal * {
+  margin-bottom: 10px;
+}
+
+.share-modal *:last-child {
+  margin-bottom: 0px;
+}
