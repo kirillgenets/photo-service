@@ -187,7 +187,10 @@ body {
 }
 
 .share-modal * {
+  max-height: 80vh;
   margin-bottom: 10px;
+
+  overflow: auto;
 }
 
 .share-modal *:last-child {
