@@ -14,6 +14,10 @@ body {
   box-sizing: border-box;
 }
 
+.hidden {
+  display: none;
+}
+
 /* Кнопки */
 
 .button {
@@ -100,13 +104,17 @@ body {
   background-color: rgba(0, 0, 0, 0.7);
 }
 
-.form__label,
-.form__input {
+.form *:not(:last-child) {
   margin-bottom: 5px;
 }
 
 .form__label {
   color: #ffffff;
+}
+
+.form__error {
+  margin: 0;
+  color: red;
 }
 
 .form--centered {
