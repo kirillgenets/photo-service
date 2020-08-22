@@ -3,10 +3,14 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
-include_once '../config/database.php';
-include_once '../objects/user.php';
+include_once '../../config/database.php';
+include_once '../../objects/user.php';
 
 function is_matches_search($str) {
+    if ($_GET['search'] === null) {
+        return true;
+    }
+
     $search_words = explode(' ', $_GET['search']);
     $search_results = array_map(function($item) use ($str) {
         return strpos($str, $item) !== false;
