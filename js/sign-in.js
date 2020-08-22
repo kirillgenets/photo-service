@@ -1,9 +1,9 @@
 (() => {
-  const URL = "api/signup/";
+  const URL = "api/login/";
   const AUTH_URL = "index-auth.html";
-  const SUCCESS_STATUS = 201;
+  const SUCCESS_STATUS = 200;
 
-  const formElement = document.querySelector(".sign-up-form");
+  const formElement = document.querySelector(".sign-in-form");
   const errorsListElement = formElement.querySelector(".form__errors");
 
   const handleFormSubmit = async (evt) => {

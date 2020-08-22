@@ -14,29 +14,30 @@
     <!-- Конец шапки -->
     <main>
       <!-- Форма регистрации -->
-      <form class="sign-in-form form form--centered" action="" method="POST">
+      <form
+        class="sign-in-form form form--centered"
+        action="api/login/"
+        method="POST"
+      >
         <a class="form__back button" href="index.html">На главную</a>
         <label class="form__label" for="phone-input">Ваш номер телефона:</label>
-        <input
-          class="form__input"
-          type="text"
-          name="phone"
-          id="phone-input"
-          required
-        />
+        <input class="form__input" type="text" name="phone" id="phone-input" />
         <label class="form__label" for="password-input">Ваш пароль:</label>
         <input
           class="form__input"
           type="password"
           name="password"
           id="password-input"
-          required
         />
         <button class="form__submit button" type="submit">
           Авторизоваться
         </button>
+        <ul class="form__errors hidden"></ul>
       </form>
       <!-- Конец формы регистрации -->
     </main>
+
+    <script src="js/utils.js"></script>
+    <script src="js/sign-in.js"></script>
   </body>
 </html>
