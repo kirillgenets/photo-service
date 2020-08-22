@@ -14,14 +14,17 @@
     <!-- Конец шапки -->
     <main>
       <!-- Форма регистрации -->
-      <form class="sign-up-form form form--centered" action="" method="POST">
+      <form
+        class="sign-up-form form form--centered"
+        action="api/signup/"
+        method="POST"
+      >
         <label class="form__label" for="name-input">Ваше имя:</label>
         <input
           class="form__input"
           type="text"
-          name="name"
+          name="first_name"
           id="name-input"
-          required
         />
         <label class="form__label" for="surname-input">Ваша фамилия:</label>
         <input
@@ -29,23 +32,15 @@
           type="text"
           name="surname"
           id="surname-input"
-          required
         />
         <label class="form__label" for="phone-input">Ваш номер телефона:</label>
-        <input
-          class="form__input"
-          type="text"
-          name="phone"
-          id="phone-input"
-          required
-        />
+        <input class="form__input" type="text" name="phone" id="phone-input" />
         <label class="form__label" for="password-input">Ваш пароль:</label>
         <input
           class="form__input"
           type="password"
           name="password"
           id="password-input"
-          required
         />
         <button class="form__submit button" type="submit">
           Зарегистрироваться
@@ -53,5 +48,7 @@
       </form>
       <!-- Конец формы регистрации -->
     </main>
+
+    <script src="js/sign-up.js"></script>
   </body>
 </html>
