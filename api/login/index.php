@@ -39,10 +39,11 @@ $validation_errors = get_validation_errors($data, $user);
 if (count($validation_errors) === 0) {
   $user->phone = $data->phone;
   $user->password = $data->password;
+  $result = $user->login();
 
-  if ($user->login()) {
+  if ($result !== false) {
     http_response_code(200);
-    echo json_encode(array("token" => uniqid('photo-service_')), JSON_UNESCAPED_UNICODE);
+    echo json_encode(array("token" => uniqid('photo-service_'), 'id' => $result), JSON_UNESCAPED_UNICODE);
   } else {
       http_response_code(404);
       echo json_encode(array("login" => "Incorrect login or password"), JSON_UNESCAPED_UNICODE);

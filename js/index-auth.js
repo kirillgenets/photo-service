@@ -61,7 +61,10 @@
 
   const handleUploadPhotoInputChange = async (evt) => {
     const formData = new FormData();
+    const authData = JSON.parse(localStorage.getItem("auth"));
+
     formData.append("photo", evt.target.files[0]);
+    formData.append("id", authData.id);
 
     const options = {
       method: "POST",

@@ -14,6 +14,14 @@ class User {
       $this->connection = $db;
   }
 
+  function get_id() {
+    $id_query = "SELECT id FROM " . $this->table_name . " WHERE phone=" . $this->phone;
+    $id_stmt = $this->connection->prepare($id_query);
+    $id_stmt->execute();
+
+    return $id_stmt->fetch(PDO::FETCH_ASSOC)['id'];
+  }
+
   function read() {
     $query = "SELECT * FROM " . $this->table_name;
     $stmt = $this->connection->prepare($query);
@@ -37,11 +45,7 @@ class User {
     $stmt->bindParam(":password", $this->password);
 
     if ($stmt->execute()) {
-        $id_query = "SELECT id FROM " . $this->table_name . " WHERE phone=" . $this->phone;
-        $id_stmt = $this->connection->prepare($id_query);
-        $id_stmt->execute();
-
-        return $id_stmt->fetch(PDO::FETCH_ASSOC)['id'];
+      return $this->get_id();
     }
 
     return false;
@@ -53,7 +57,7 @@ class User {
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    return password_verify($this->password, $result['password']);
+    return password_verify($this->password, $result['password']) ? $this->get_id() : false;
   }
 
   function exists($phone) {

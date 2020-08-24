@@ -22,6 +22,8 @@
 
     const result = await response.json();
 
+    localStorage.setItem("auth", JSON.stringify(result));
+
     if (response.status !== SUCCESS_STATUS) {
       window.utils.renderValidationErrors(result, errorsListElement);
       return;

@@ -36,7 +36,7 @@ class Photo {
     $stmt->bindParam(":name", $this->name);
 
     if ($stmt->execute()) {
-      $id_query = "SELECT id, name, url FROM " . $this->table_name . " WHERE url=" . $this->url;
+      $id_query = "SELECT id, name, url FROM " . $this->table_name . " WHERE url='" . $this->url . "'";
       $id_stmt = $this->connection->prepare($id_query);
       $id_stmt->execute();
 
