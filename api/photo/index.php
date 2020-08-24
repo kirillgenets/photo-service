@@ -56,7 +56,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode($validation_errors, JSON_UNESCAPED_UNICODE);
   }
 } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-  echo 'GETGETGET!!!';
+  $stmt = $photo->read();
+
+  $photos_list = array();
+
+  while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+      extract($row);
+
+      $photo_item = array(
+          "id" => $id,
+          "name" => $name,
+          "url" => $url,
+          "owner_id" => $owner_id
+      );
+
+      array_push($photos_list, $photo_item);
+  }
+
+  http_response_code(200);
+  echo json_encode($photos_list);
 }
 
 ?>
