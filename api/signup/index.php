@@ -60,7 +60,7 @@ if (count($validation_errors) === 0) {
         echo json_encode(array("id" => $result), JSON_UNESCAPED_UNICODE);
     } else {
         http_response_code(503);
-        echo json_encode(array("common" => "Невозможно создать пользователя."), JSON_UNESCAPED_UNICODE);
+        echo json_encode(array("error" => "Невозможно создать пользователя."), JSON_UNESCAPED_UNICODE);
     }
 } else {
     http_response_code(422);
