@@ -1,1 +1,3 @@
-storage/*
+storage/*.jpg
+storage/*.png
+storage/*.jpeg
