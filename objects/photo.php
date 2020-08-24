@@ -1,6 +1,6 @@
 <?php
 
-class User {
+class Photo {
   private $connection;
   private $table_name = "photos";
   private $default_photo_name = "Untitled";
