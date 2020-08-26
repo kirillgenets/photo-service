@@ -9,6 +9,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 include_once '../../config/database.php';
 include_once '../../objects/photo.php';
 
+var_dump($_GET);
 $database = new Database();
 $db = $database->getConnection();
 
