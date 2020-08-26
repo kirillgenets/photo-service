@@ -9,7 +9,6 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 include_once '../../config/database.php';
 include_once '../../objects/photo.php';
 
-var_dump($_GET);
 $database = new Database();
 $db = $database->getConnection();
 
@@ -56,6 +55,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     http_response_code(422);
     echo json_encode($validation_errors, JSON_UNESCAPED_UNICODE);
   }
+} else if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['id'])) {
+  $result = $photo->read_one($_GET['id']);
+
+  if ($result !== false) {
+    http_response_code(200);
+    echo json_encode($result->fetch(PDO::FETCH_ASSOC), JSON_UNESCAPED_UNICODE);
+  } else {
+    http_response_code(404);
+    echo json_encode(array("error" => "Нет фотографии с таким идентификатором!"), JSON_UNESCAPED_UNICODE);
+  }
+  // $photos_list = array();
+
+  // http_response_code(200);
+  // echo json_encode($photos_list);
 } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $stmt = $photo->read();
 

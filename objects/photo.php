@@ -23,6 +23,14 @@ class Photo {
     return $stmt;
   }
 
+  function read_one($id) {
+    $query = "SELECT * FROM " . $this->table_name . " WHERE id=" . $id;
+    $stmt = $this->connection->prepare($query);
+    $stmt->execute();
+
+    return $stmt;
+  }
+
   function create() {
     $query = "INSERT INTO " . $this->table_name . " SET name=:name, url=:url, owner_id=:owner_id";
     $stmt = $this->connection->prepare($query);
