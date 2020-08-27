@@ -1,3 +1,4 @@
 RewriteEngine On
 RewriteBase /
 RewriteRule ^api/photo/(\d+)$ /api/photo/?id=$1 [L,R=301]
+RewriteRule ^api/user/(\d+)/share$ /api/user/?id=$1 [L,R=301]

@@ -14,7 +14,9 @@ $db = $database->getConnection();
 
 $photo = new Photo($db);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['_method'] === 'delete') {
+  var_dump($_POST);
+} else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   function get_validation_errors() {
     $photo_format = $_FILES['photo']['type'];
     $errors = [];
@@ -56,19 +58,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode($validation_errors, JSON_UNESCAPED_UNICODE);
   }
 } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['id'])) {
-  $result = $photo->read_one($_GET['id']);
+  $result = $photo->read_one($_GET['id'])->fetch(PDO::FETCH_ASSOC);
 
   if ($result !== false) {
     http_response_code(200);
-    echo json_encode($result->fetch(PDO::FETCH_ASSOC), JSON_UNESCAPED_UNICODE);
+    echo json_encode($result, JSON_UNESCAPED_UNICODE);
   } else {
     http_response_code(404);
     echo json_encode(array("error" => "Нет фотографии с таким идентификатором!"), JSON_UNESCAPED_UNICODE);
   }
-  // $photos_list = array();
-
-  // http_response_code(200);
-  // echo json_encode($photos_list);
 } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $stmt = $photo->read();
 

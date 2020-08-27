@@ -53,6 +53,14 @@ class Photo {
 
     return false;
   }
+
+  function delete($id) {
+    $query = "DELETE FROM " . $this->table_name . " WHERE id=" . $id;
+    $stmt = $this->connection->prepare($query);
+    $stmt->execute();
+
+    return $stmt;
+  }
 }
 
 ?>

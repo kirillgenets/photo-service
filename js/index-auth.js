@@ -43,22 +43,6 @@
   const photosListWrapper = document.querySelector(".photos__list");
   const uploadPhotoInput = document.querySelector(".photos__upload-button");
 
-  const handleFileReaderLoadEnded = async (evt) => {
-    const response = await fetch(UPLOAD_PHOTO_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "multipart/form-data; charset=utf-8;",
-      },
-      body: JSON.stringify({ photo: evt.target.result }),
-    });
-
-    const result = await response.text();
-    console.log("handleFileReaderLoadEnded -> result", result);
-    // body: JSON.stringify({
-    //   photo: evt.target.result,
-    // }),
-  };
-
   const handleUploadPhotoInputChange = async (evt) => {
     const formData = new FormData();
     const authData = JSON.parse(localStorage.getItem("auth"));
@@ -78,7 +62,7 @@
 
     const response = await fetch(UPLOAD_PHOTO_URL, options);
 
-    const result = await response.text();
+    const result = await response.json();
     console.log("handleFileReaderLoadEnded -> result", result);
     // const reader = new FileReader();
 
