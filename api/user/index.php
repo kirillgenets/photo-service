@@ -14,10 +14,6 @@ $db = $database->getConnection();
 
 $user = new User($db);
 
-var_dump($_GET);
-var_dump($_POST);
-var_dump($_SERVER['REQUEST_METHOD']);
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_GET['id']) {
     var_dump($_GET);
 } else {

@@ -14,8 +14,11 @@ $db = $database->getConnection();
 
 $photo = new Photo($db);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['_method'] === 'delete') {
-  var_dump($_POST);
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && $_GET['id']) {
+  $result = $photo->delete($_GET['id']);
+
+  http_response_code(204);
+  echo json_encode(array("success" => "Фотография удалена успешно!!"), JSON_UNESCAPED_UNICODE);
 } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   function get_validation_errors() {
     $photo_format = $_FILES['photo']['type'];

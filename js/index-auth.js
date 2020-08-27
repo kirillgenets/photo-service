@@ -1,47 +1,63 @@
 (() => {
-  const UPLOAD_PHOTO_URL = "api/photo/";
-
-  const PHOTOS_DATA = [
-    {
-      id: 0,
-      name: "Просто фотка",
-      owner_id: 0,
-      users: [0, 1, 2],
-      url: "img/1.jpg",
-    },
-    {
-      id: 1,
-      name: "Просто фотка",
-      owner_id: 0,
-      users: [0, 1, 2],
-      url: "img/_21.jpg",
-    },
-    {
-      id: 2,
-      name: "Просто фотка",
-      owner_id: 0,
-      users: [0, 1, 2],
-      url: "img/13.jpg",
-    },
-    {
-      id: 3,
-      name: "Просто фотка",
-      owner_id: 0,
-      users: [0, 1, 2],
-      url: "img/images.jpg",
-    },
-    {
-      id: 4,
-      name: "Просто фотка",
-      owner_id: 0,
-      users: [0, 1, 2],
-      url: "img/kazan1.jpg",
-    },
-  ];
+  const PHOTOS_URL = "api/photo/";
+  const POST_SUCCESS_STATUS = 201;
+  const GET_SUCCESS_STATUS = 200;
+  const DELETE_SUCCESS_STATUS = 204;
 
   const photoTemplate = document.querySelector("#photo");
   const photosListWrapper = document.querySelector(".photos__list");
   const uploadPhotoInput = document.querySelector(".photos__upload-button");
+
+  const handlePhotoDeleteButtonClick = (id) => async (evt) => {
+    const response = await fetch(`${PHOTOS_URL}/${id}`, {
+      method: "DELETE",
+    });
+
+    if (response.status !== DELETE_SUCCESS_STATUS) return;
+    evt.target.parentNode.remove();
+  };
+
+  const handlePhotoEditButtonClick = (evt) => {
+    console.log("handlePhotoEditButtonClick -> evt", evt);
+  };
+
+  const handlePhotoShareButtonClick = (evt) => {
+    console.log("handlePhotoShareButtonClick -> evt", evt);
+  };
+
+  const handlePhotoTitleChange = (evt) => {
+    console.log("handlePhotoTitleChange -> evt", evt);
+  };
+
+  const setPhotoEventListeners = (element, id) => {
+    element
+      .querySelector(".photo__button--delete")
+      .addEventListener("click", handlePhotoDeleteButtonClick(id));
+    element
+      .querySelector(".photo__button--edit")
+      .addEventListener("click", handlePhotoEditButtonClick);
+    element
+      .querySelector(".photo__button--share")
+      .addEventListener("click", handlePhotoShareButtonClick);
+    element
+      .querySelector(".photo__title")
+      .addEventListener("change", handlePhotoTitleChange);
+  };
+
+  const renderPhoto = ({ id, name, url }) => {
+    const wrapper = photoTemplate.content.cloneNode(true);
+    const thumbnailElement = wrapper.querySelector(".photo__thumbnail");
+    const titleElement = wrapper.querySelector(".photo__title");
+
+    thumbnailElement.src = url;
+    thumbnailElement.alt = name;
+
+    titleElement.value = name;
+
+    setPhotoEventListeners(wrapper, id);
+
+    return wrapper;
+  };
 
   const handleUploadPhotoInputChange = async (evt) => {
     const formData = new FormData();
@@ -60,67 +76,29 @@
 
     delete options.headers["Content-Type"];
 
-    const response = await fetch(UPLOAD_PHOTO_URL, options);
-
+    const response = await fetch(PHOTOS_URL, options);
     const result = await response.json();
-    console.log("handleFileReaderLoadEnded -> result", result);
-    // const reader = new FileReader();
 
-    // reader.readAsDataURL(evt.target.files[0]);
-    // reader.addEventListener("loadend", handleFileReaderLoadEnded);
+    if (response.status === POST_SUCCESS_STATUS) {
+      photosListWrapper.append(renderPhoto(result));
+    }
   };
 
-  const renderAllPhotos = () => {
+  const renderAllPhotos = async () => {
+    const response = await fetch(PHOTOS_URL, { method: "GET" });
+    const result = await response.json();
+
+    const data =
+      response.status === GET_SUCCESS_STATUS
+        ? result.filter(
+            ({ owner_id: ownerId }) =>
+              ownerId === JSON.parse(localStorage.getItem("auth")).id
+          )
+        : [];
+
     const photosListWrapperFragment = document.createDocumentFragment();
 
-    const handlePhotoDeleteButtonClick = (evt) => {
-      console.log("handlePhotoDeleteButtonClick -> evt", evt);
-    };
-
-    const handlePhotoEditButtonClick = (evt) => {
-      console.log("handlePhotoEditButtonClick -> evt", evt);
-    };
-
-    const handlePhotoShareButtonClick = (evt) => {
-      console.log("handlePhotoShareButtonClick -> evt", evt);
-    };
-
-    const handlePhotoTitleChange = (evt) => {
-      console.log("handlePhotoTitleChange -> evt", evt);
-    };
-
-    const setPhotoEventListeners = (element) => {
-      element
-        .querySelector(".photo__button--delete")
-        .addEventListener("click", handlePhotoDeleteButtonClick);
-      element
-        .querySelector(".photo__button--edit")
-        .addEventListener("click", handlePhotoEditButtonClick);
-      element
-        .querySelector(".photo__button--share")
-        .addEventListener("click", handlePhotoShareButtonClick);
-      element
-        .querySelector(".photo__title")
-        .addEventListener("change", handlePhotoTitleChange);
-    };
-
-    photosListWrapperFragment.append(
-      ...PHOTOS_DATA.map(({ name, url }) => {
-        const wrapper = photoTemplate.content.cloneNode(true);
-        const thumbnailElement = wrapper.querySelector(".photo__thumbnail");
-        const titleElement = wrapper.querySelector(".photo__title");
-
-        thumbnailElement.src = url;
-        thumbnailElement.alt = name;
-
-        titleElement.value = name;
-
-        setPhotoEventListeners(wrapper);
-
-        return wrapper;
-      })
-    );
-
+    photosListWrapperFragment.append(...data.map(renderPhoto));
     photosListWrapper.append(photosListWrapperFragment);
   };
 
