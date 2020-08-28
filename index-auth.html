@@ -45,8 +45,9 @@
           id="photo-input"
           name="photo"
         />
+        <div class="photos__list"></div>
+        <div class="photos__pagination"></div>
       </div>
-      <div class="photos__list"></div>
     </main>
     <!-- Шаблон фотографии -->
     <template id="photo">
@@ -69,6 +70,11 @@
           Поделиться
         </button>
       </div>
+    </template>
+    <template id="pagination-item">
+      <a class="photos__pagination-item" href="#">
+        0
+      </a>
     </template>
 
     <script src="js/index-auth.js"></script>

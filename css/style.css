@@ -149,6 +149,21 @@ body {
   flex-wrap: wrap;
 }
 
+.photos__pagination {
+  margin-bottom: 15px;
+
+  text-align: center;
+}
+
+.photos__pagination-item {
+  font-size: 18px;
+  color: #ffffff;
+}
+
+.photos__pagination-item:not(:last-child) {
+  margin-right: 5px;
+}
+
 .photo {
   display: flex;
   flex-direction: column;

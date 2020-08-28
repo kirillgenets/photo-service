@@ -1,12 +1,22 @@
 (() => {
   const PHOTOS_URL = "api/photo/";
+  const USERS_URL = "api/user/";
   const POST_SUCCESS_STATUS = 201;
   const GET_SUCCESS_STATUS = 200;
   const DELETE_SUCCESS_STATUS = 204;
+  const PHOTOS_PER_PAGE = 6;
 
   const photoTemplate = document.querySelector("#photo");
-  const photosListWrapper = document.querySelector(".photos__list");
-  const uploadPhotoInput = document.querySelector(".photos__upload-button");
+  const paginationItemTemplate = document.querySelector("#pagination-item");
+
+  const photosWrapper = document.querySelector(".photos");
+  const photosListWrapper = photosWrapper.querySelector(".photos__list");
+  const uploadPhotoInput = photosWrapper.querySelector(
+    ".photos__upload-button"
+  );
+  const paginationWrapper = photosWrapper.querySelector(".photos__pagination");
+
+  let currentPage = 1;
 
   const handlePhotoDeleteButtonClick = (id) => async (evt) => {
     const response = await fetch(`${PHOTOS_URL}/${id}`, {
@@ -22,6 +32,13 @@
   };
 
   const handlePhotoShareButtonClick = (evt) => {
+    // const response = await fetch(`${USERS_URL}/${id}/share`, {
+    //   method: "POST",
+    //   body: {}
+    // });
+
+    // if (response.status !== DELETE_SUCCESS_STATUS) return;
+    // evt.target.remove();
     console.log("handlePhotoShareButtonClick -> evt", evt);
   };
 
@@ -84,8 +101,45 @@
     }
   };
 
-  const renderAllPhotos = async () => {
+  const handlePaginationItemClick = (evt) => {
+    evt.preventDefault();
+
+    currentPage = evt.target.dataset.id;
+    renderAllPhotos();
+  };
+
+  const renderPagination = async () => {
     const response = await fetch(PHOTOS_URL, { method: "GET" });
+    const result = await response.json();
+    const photosCount = Math.ceil(result.length / PHOTOS_PER_PAGE);
+
+    const paginationWrapperFragment = document.createDocumentFragment();
+
+    for (let i = 1; i <= photosCount; i++) {
+      const paginationItemElement = document.createElement("a");
+
+      paginationItemElement.classList.add("photos__pagination-item");
+      paginationItemElement.href = i;
+      paginationItemElement.textContent = i;
+      paginationItemElement.setAttribute("data-id", i);
+
+      paginationItemElement.addEventListener(
+        "click",
+        handlePaginationItemClick
+      );
+
+      paginationWrapperFragment.append(paginationItemElement);
+    }
+
+    paginationWrapper.append(paginationWrapperFragment);
+  };
+
+  const renderAllPhotos = async () => {
+    photosListWrapper.innerHTML = "";
+
+    const response = await fetch(`${PHOTOS_URL}/?page=${currentPage}`, {
+      method: "GET",
+    });
     const result = await response.json();
 
     const data =
@@ -103,6 +157,7 @@
   };
 
   renderAllPhotos();
+  renderPagination();
 
   uploadPhotoInput.addEventListener("change", handleUploadPhotoInputChange);
 })();

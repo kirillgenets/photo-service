@@ -9,6 +9,8 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 include_once '../../config/database.php';
 include_once '../../objects/photo.php';
 
+const PAGE_SIZE = 6;
+
 $database = new Database();
 $db = $database->getConnection();
 
@@ -42,9 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && $_GET['id']) {
   $validation_errors = get_validation_errors($data);
   
   if (count($validation_errors) === 0) {
-    $filename = uniqid() . '_' . $_FILES['photo']['name'];
-    move_uploaded_file($_FILES['photo']['tmp_name'], '../../storage/' . $filename);
-  
+    $filename = uniqid() . '_' . $_FILES['photo']['name'] . '.png';
+
+    imagepng(imagecreatefromstring(file_get_contents($_FILES['photo']['tmp_name'])), '../../storage/' . $filename);
+
     $photo->url = 'http://photo-service/storage/' . $filename;
     $photo->owner_id = $_POST['id'];
     $result = $photo->create();
@@ -75,7 +78,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && $_GET['id']) {
 
   $photos_list = array();
 
+  $i = 1;
+  $max_index = $_GET['page'] * PAGE_SIZE;
+  $min_index = $max_index - PAGE_SIZE;
+
   while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+      if ($min_index && $i < $min_index) {
+        $i++;
+        continue;
+      }
+
+      if ($max_index && $i > $max_index) break;
+
       extract($row);
 
       $photo_item = array(
@@ -86,6 +100,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && $_GET['id']) {
       );
 
       array_push($photos_list, $photo_item);
+
+      $i++;
   }
 
   http_response_code(200);
