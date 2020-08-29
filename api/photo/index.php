@@ -9,6 +9,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 include_once '../../config/database.php';
 include_once '../../objects/photo.php';
 
+const BYTES_IN_MEGABYTE = 1048576;
 const PAGE_SIZE = 6;
 
 $database = new Database();
@@ -36,11 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && !empty($_GET['id']) && !empty($_G
       substr($photo_format, strlen($photo_format) - 3, 3) == 'jpg';
   
     if (empty($_FILES['photo'])) {
-        $errors['photo'] = 'Файл картинки обязателен!';
+      $errors['photo'] = 'Файл картинки обязателен!';
     }
   
     if (!$is_format_correct) {
-        $errors['photo'] = "Фотография может быть только в форматах jpg, jpeg и png";
+      $errors['photo'] = "Фотография может быть только в форматах jpg, jpeg и png";
+    }
+
+    if (filesize($_FILES['photo']['tmp_name']) > 1048576) {
+      $errors['photo'] = "Размер фотографии не должен превышать 1 МБ";
     }
   
     return $errors;
