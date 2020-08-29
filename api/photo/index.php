@@ -97,6 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && !empty($_GET['id']) && !empty($_G
 
       extract($row);
 
+      if (!empty($_GET['owner_id']) && $_GET['owner_id'] !== $owner_id) continue;
+
       $photo_item = array(
           "id" => $id,
           "name" => $name,

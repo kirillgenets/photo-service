@@ -117,12 +117,12 @@
   const renderPagination = async () => {
     paginationWrapper.innerHTML = "";
 
-    const response = await fetch(PHOTOS_URL, { method: "GET" });
+    const response = await fetch(`${PHOTOS_URL}/?owner_id=${authData.id}`, {
+      method: "GET",
+    });
     const result = await response.json();
-    const photosCount = result.filter(
-      ({ owner_id: ownerId }) => ownerId === authData.id
-    );
-    const pagesCount = Math.ceil(photosCount.length / PHOTOS_PER_PAGE);
+    const photosCount = result.length;
+    const pagesCount = Math.ceil(photosCount / PHOTOS_PER_PAGE);
 
     if (!photosCount) return;
 
@@ -150,15 +150,15 @@
   const renderAllPhotos = async () => {
     photosListWrapper.innerHTML = "";
 
-    const response = await fetch(`${PHOTOS_URL}/?page=${currentPage}`, {
-      method: "GET",
-    });
+    const response = await fetch(
+      `${PHOTOS_URL}/?page=${currentPage}&owner_id=${authData.id}`,
+      {
+        method: "GET",
+      }
+    );
     const result = await response.json();
 
-    const data =
-      response.status === GET_SUCCESS_STATUS
-        ? result.filter(({ owner_id: ownerId }) => ownerId === authData.id)
-        : [];
+    const data = response.status === GET_SUCCESS_STATUS ? result : [];
 
     const photosListWrapperFragment = document.createDocumentFragment();
 
