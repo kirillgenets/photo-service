@@ -54,12 +54,21 @@ class Photo {
     return false;
   }
 
-  function delete($id) {
-    $query = "DELETE FROM " . $this->table_name . " WHERE id=" . $id;
+  function is_deletable($id, $owner_id) {
+    $query = "SELECT * FROM " . $this->table_name . " WHERE id=" . $id . " AND owner_id=" . $owner_id;
     $stmt = $this->connection->prepare($query);
     $stmt->execute();
 
-    return $stmt;
+    return $stmt->fetch(PDO::FETCH_ASSOC) !== false;
+  }
+
+  function delete($id, $owner_id) {
+    $query = "DELETE FROM " . $this->table_name . " WHERE id=" . $id . " AND owner_id=" . $owner_id;
+    $stmt = $this->connection->prepare($query);
+    $is_auth = $this->is_deletable($id, $owner_id);
+    $stmt->execute();
+
+    return $is_auth;
   }
 }
 

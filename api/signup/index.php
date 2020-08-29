@@ -9,6 +9,8 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 include_once '../../config/database.php';
 include_once '../../objects/user.php';
 
+const SPECIAL_SYMBOLS = ['!', '_', '\-', '#'];
+
 $database = new Database();
 $db = $database->getConnection();
 
@@ -27,6 +29,14 @@ function get_validation_errors($data, $user) {
         $errors['surname'] = 'Фамилия обязательна!';
     }
 
+    if (!empty($data->first_name) && preg_match("/[a-z]/", strtolower($data->first_name)) !== 0) {
+        $errors['first-name'] = 'Имя может содержать только кириллицу!';
+    }
+
+    if (!empty($data->surname) && preg_match("/[a-z]/", strtolower($data->surname)) !== 0) {
+        $errors['surname'] = 'Фамилия может содержать только кириллицу!';
+    }
+
     if (empty($data->phone)) {
         $errors['phone'] = 'Номер телефона обязателен!';
     }
@@ -41,6 +51,24 @@ function get_validation_errors($data, $user) {
 
     if ($user->exists($data->phone)) {
         $errors['phone'] = "Такой номер телефона уже зарегистрирован!";
+    }
+
+    if (!empty($data->password)) {
+        if (strlen($data->password) < 6) {
+            $errors['password'] = "Пароль должен быть не короче 6 символов!";
+        }
+
+        if (strtolower($data->password) === $data->password || strtoupper($data->password) === $data->password) {
+            $errors['password'] .= "Пароль должен содержать буквы верхнего и нижнего регистра!";
+        }
+
+        if (preg_match_all( "/[0-9]/", $data->password) === 0) {
+            $errors['password'] .= " Пароль должен содержать цифру!";
+        }
+
+        if (preg_match_all( "/[" . implode("", SPECIAL_SYMBOLS) . "]/", $data->password) === 0) {
+            $errors['password'] .= " Пароль должен содержать спецсимвол (один из «!, _, -, #»)!";
+        }
     }
 
     return $errors;

@@ -1,4 +1,5 @@
 (() => {
+  const SIGN_IN_URL = "sign-in.html";
   const PHOTOS_URL = "api/photo/";
   const USERS_URL = "api/user/";
   const POST_SUCCESS_STATUS = 201;
@@ -7,8 +8,6 @@
   const PHOTOS_PER_PAGE = 6;
 
   const photoTemplate = document.querySelector("#photo");
-  const paginationItemTemplate = document.querySelector("#pagination-item");
-
   const photosWrapper = document.querySelector(".photos");
   const photosListWrapper = photosWrapper.querySelector(".photos__list");
   const uploadPhotoInput = photosWrapper.querySelector(
@@ -16,15 +15,22 @@
   );
   const paginationWrapper = photosWrapper.querySelector(".photos__pagination");
 
+  const authData = JSON.parse(localStorage.getItem("auth"));
   let currentPage = 1;
 
+  if (!authData) window.location.replace(SIGN_IN_URL);
+
   const handlePhotoDeleteButtonClick = (id) => async (evt) => {
-    const response = await fetch(`${PHOTOS_URL}/${id}`, {
-      method: "DELETE",
-    });
+    const response = await fetch(
+      `${PHOTOS_URL}/${id}/?owner_id=${authData.id}`,
+      {
+        method: "DELETE",
+      }
+    );
 
     if (response.status !== DELETE_SUCCESS_STATUS) return;
     evt.target.parentNode.remove();
+    renderPagination();
   };
 
   const handlePhotoEditButtonClick = (evt) => {
@@ -78,7 +84,6 @@
 
   const handleUploadPhotoInputChange = async (evt) => {
     const formData = new FormData();
-    const authData = JSON.parse(localStorage.getItem("auth"));
 
     formData.append("photo", evt.target.files[0]);
     formData.append("id", authData.id);
@@ -96,9 +101,10 @@
     const response = await fetch(PHOTOS_URL, options);
     const result = await response.json();
 
-    if (response.status === POST_SUCCESS_STATUS) {
-      photosListWrapper.append(renderPhoto(result));
-    }
+    if (response.status !== POST_SUCCESS_STATUS) return;
+
+    photosListWrapper.append(renderPhoto(result));
+    renderPagination();
   };
 
   const handlePaginationItemClick = (evt) => {
@@ -109,13 +115,20 @@
   };
 
   const renderPagination = async () => {
+    paginationWrapper.innerHTML = "";
+
     const response = await fetch(PHOTOS_URL, { method: "GET" });
     const result = await response.json();
-    const photosCount = Math.ceil(result.length / PHOTOS_PER_PAGE);
+    const photosCount = result.filter(
+      ({ owner_id: ownerId }) => ownerId === authData.id
+    );
+    const pagesCount = Math.ceil(photosCount.length / PHOTOS_PER_PAGE);
+
+    if (!photosCount) return;
 
     const paginationWrapperFragment = document.createDocumentFragment();
 
-    for (let i = 1; i <= photosCount; i++) {
+    for (let i = 1; i <= pagesCount; i++) {
       const paginationItemElement = document.createElement("a");
 
       paginationItemElement.classList.add("photos__pagination-item");
@@ -144,10 +157,7 @@
 
     const data =
       response.status === GET_SUCCESS_STATUS
-        ? result.filter(
-            ({ owner_id: ownerId }) =>
-              ownerId === JSON.parse(localStorage.getItem("auth")).id
-          )
+        ? result.filter(({ owner_id: ownerId }) => ownerId === authData.id)
         : [];
 
     const photosListWrapperFragment = document.createDocumentFragment();

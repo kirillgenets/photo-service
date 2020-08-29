@@ -1,6 +1,6 @@
 (() => {
   const URL = "api/signup/";
-  const AUTH_URL = "index-auth.html";
+  const SIGN_IN_URL = "sign-in.html";
   const SUCCESS_STATUS = 201;
 
   const formElement = document.querySelector(".sign-up-form");
@@ -22,14 +22,12 @@
 
     const result = await response.json();
 
-    localStorage.setItem("auth", JSON.stringify(result));
-
     if (response.status !== SUCCESS_STATUS) {
       window.utils.renderValidationErrors(result, errorsListElement);
       return;
     }
 
-    window.location.replace(AUTH_URL);
+    window.location.replace(SIGN_IN_URL);
   };
 
   formElement.addEventListener("submit", handleFormSubmit);
