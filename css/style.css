@@ -62,12 +62,13 @@ body {
   padding: 15px;
 
   background-color: #076d4e;
+
+  text-align: center;
 }
 
 .header__title {
   font-size: 25px;
   font-weight: normal;
-  text-align: center;
   color: #ffffff;
 }
 

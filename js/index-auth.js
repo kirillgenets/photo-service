@@ -15,6 +15,8 @@
   );
   const paginationWrapper = photosWrapper.querySelector(".photos__pagination");
 
+  const exitButton = document.querySelector(".header__exit-button");
+
   const authData = JSON.parse(localStorage.getItem("auth"));
   let currentPage = 1;
 
@@ -176,8 +178,14 @@
     photosListWrapper.append(photosListWrapperFragment);
   };
 
+  const handleExitButtonClick = () => {
+    localStorage.removeItem("auth");
+    window.location.replace(SIGN_IN_URL);
+  };
+
   renderAllPhotos();
   renderPagination();
 
   uploadPhotoInput.addEventListener("change", handleUploadPhotoInputChange);
+  exitButton.addEventListener("click", handleExitButtonClick);
 })();
