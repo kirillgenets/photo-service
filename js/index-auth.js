@@ -25,6 +25,9 @@
       `${PHOTOS_URL}/${id}/?owner_id=${authData.id}`,
       {
         method: "DELETE",
+        headers: {
+          ["Authorization"]: authData.token,
+        },
       }
     );
 
@@ -92,6 +95,7 @@
       method: "POST",
       headers: {
         "Content-Type": "multipart/form-data; charset=utf-8;",
+        ["Authorization"]: authData.token,
       },
       body: formData,
     };
@@ -119,6 +123,9 @@
 
     const response = await fetch(`${PHOTOS_URL}/?owner_id=${authData.id}`, {
       method: "GET",
+      headers: {
+        ["Authorization"]: authData.token,
+      },
     });
     const result = await response.json();
     const photosCount = result.length;
@@ -154,6 +161,9 @@
       `${PHOTOS_URL}/?page=${currentPage}&owner_id=${authData.id}`,
       {
         method: "GET",
+        headers: {
+          ["Authorization"]: authData.token,
+        },
       }
     );
     const result = await response.json();

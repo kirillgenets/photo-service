@@ -62,11 +62,15 @@ if (count($validation_errors) === 0) {
   $result = $user->login();
 
   if ($result !== false) {
+    $bearer_token = uniqid('photo-service_');
+    session_start();
+    $_SESSION['bearer_token'] = $bearer_token;
+
     http_response_code(200);
-    echo json_encode(array("token" => uniqid('photo-service_'), 'id' => $result), JSON_UNESCAPED_UNICODE);
+    echo json_encode(array("token" => $bearer_token, 'id' => $result), JSON_UNESCAPED_UNICODE);
   } else {
-      http_response_code(404);
-      echo json_encode(array("login" => "Incorrect login or password"), JSON_UNESCAPED_UNICODE);
+    http_response_code(404);
+    echo json_encode(array("login" => "Incorrect login or password"), JSON_UNESCAPED_UNICODE);
   }
 } else {
   http_response_code(422);
