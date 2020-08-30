@@ -99,10 +99,7 @@ body {
   align-items: center;
 
   width: 200px;
-  padding: 15px;
-  border-radius: 10px;
-
-  background-color: rgba(0, 0, 0, 0.7);
+  margin: 0 auto;
 }
 
 .form *:not(:last-child) {
@@ -116,10 +113,6 @@ body {
 .form__error {
   margin: 0;
   color: red;
-}
-
-.form--centered {
-  margin: 30vh auto 0;
 }
 
 /* Фотографии */
@@ -171,9 +164,13 @@ body {
 
   width: 180px;
   margin-bottom: 15px;
+
+  color: #ffffff;
+  text-align: center;
 }
 
 .photo * {
+  margin-top: 0;
   margin-bottom: 5px;
 }
 
@@ -183,10 +180,6 @@ body {
 
 .photo__thumbnail {
   height: 180px;
-}
-
-.photo__title {
-  text-align: center;
 }
 
 /* Модальное окно */

@@ -14,6 +14,59 @@
     </header>
     <!-- Конец шапки -->
     <main>
+      <div class="upload-photo modal hidden">
+        <h2>Загрузить фотографию</h2>
+        <form
+          class="upload-photo__form form"
+          action="api/photo/"
+          enctype="multipart/form-data"
+        >
+          <label class="form__label" for="upload-name"
+            >Название фотографии</label
+          >
+          <input class="form__input" type="text" name="name" id="upload-name" />
+          <label class="form__label" for="upload-hashtags">Хештеги</label>
+          <input
+            class="form__input"
+            type="text"
+            name="hashtags"
+            id="upload-hashtags"
+          />
+          <button
+            class="upload-photo__submit button button-smaller"
+            type="submit"
+          >
+            Загрузить
+          </button>
+          <ul class="form__errors"></ul>
+        </form>
+      </div>
+      <div class="update-photo modal hidden">
+        <h2>Редактировать фотографию</h2>
+        <div class="update-photo__form">
+          <label for="update-name" class="update-photo__label"
+            >Название фотографии</label
+          >
+          <input
+            class="update-photo__input"
+            type="text"
+            name="name"
+            id="update-name"
+          />
+          <label for="update-hashtags" class="update-photo__label"
+            >Хештеги</label
+          >
+          <input
+            class="update-photo__input"
+            type="text"
+            name="hashtags"
+            id="update-hashtags"
+          />
+          <button class="update-photo__submit button button-smaller">
+            Редактировать
+          </button>
+        </div>
+      </div>
       <div class="share-modal modal hidden">
         <h2>Поделиться фотографией</h2>
         <form class="share-modal__form" action="">
@@ -60,7 +113,8 @@
           width="180"
           height="180"
         />
-        <input class="photo__title" type="text" />
+        <p class="photo__title">Название</p>
+        <p class="photo__hashtags">Название</p>
         <button class="photo__button photo__button--edit button--smaller">
           Редактировать
         </button>
@@ -73,6 +127,7 @@
       </div>
     </template>
 
+    <script src="js/utils.js"></script>
     <script src="js/index-auth.js"></script>
   </body>
 </html>

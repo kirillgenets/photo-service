@@ -6,9 +6,15 @@
   const GET_SUCCESS_STATUS = 200;
   const DELETE_SUCCESS_STATUS = 204;
   const PHOTOS_PER_PAGE = 6;
+  const HASHTAGS_ALTERNATIVE_TEXT = "Нет хэштегов";
 
   const photoTemplate = document.querySelector("#photo");
   const photosWrapper = document.querySelector(".photos");
+
+  const uploadPhotoModal = document.querySelector(".upload-photo");
+  const uploadPhotoForm = uploadPhotoModal.querySelector(".upload-photo__form");
+  const uploadPhotoFormErrors = uploadPhotoForm.querySelector(".form__errors");
+
   const photosListWrapper = photosWrapper.querySelector(".photos__list");
   const uploadPhotoInput = photosWrapper.querySelector(
     ".photos__upload-button"
@@ -72,45 +78,68 @@
       .addEventListener("change", handlePhotoTitleChange);
   };
 
-  const renderPhoto = ({ id, name, url }) => {
+  const renderPhoto = ({ id, name, url, hashtags }) => {
     const wrapper = photoTemplate.content.cloneNode(true);
     const thumbnailElement = wrapper.querySelector(".photo__thumbnail");
     const titleElement = wrapper.querySelector(".photo__title");
+    const hashtagsElement = wrapper.querySelector(".photo__hashtags");
 
     thumbnailElement.src = url;
     thumbnailElement.alt = name;
 
-    titleElement.value = name;
+    titleElement.textContent = name;
+    hashtagsElement.textContent = hashtags || HASHTAGS_ALTERNATIVE_TEXT;
 
     setPhotoEventListeners(wrapper, id);
 
     return wrapper;
   };
 
-  const handleUploadPhotoInputChange = async (evt) => {
-    const formData = new FormData();
-
-    formData.append("photo", evt.target.files[0]);
-    formData.append("id", authData.id);
-
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "multipart/form-data; charset=utf-8;",
-        ["Authorization"]: authData.token,
-      },
-      body: formData,
+  const renderUploadPhotoModal = (photo) => {
+    const destroyModal = () => {
+      uploadPhotoInput.value = "";
+      uploadPhotoModal.classList.add("hidden");
     };
 
-    delete options.headers["Content-Type"];
+    const handleFormSubmit = async (evt) => {
+      evt.preventDefault();
+      uploadPhotoFormErrors.innerHTML = "";
 
-    const response = await fetch(PHOTOS_URL, options);
-    const result = await response.json();
+      const formData = new FormData(evt.target);
 
-    if (response.status !== POST_SUCCESS_STATUS) return;
+      formData.append("photo", photo);
+      formData.append("id", authData.id);
 
-    photosListWrapper.append(renderPhoto(result));
-    renderPagination();
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data; charset=utf-8;",
+          ["Authorization"]: authData.token,
+        },
+        body: formData,
+      };
+
+      delete options.headers["Content-Type"];
+
+      const response = await fetch(PHOTOS_URL, options);
+      const result = await response.json();
+
+      if (response.status !== POST_SUCCESS_STATUS) {
+        window.utils.renderValidationErrors(result, uploadPhotoFormErrors);
+        return;
+      }
+
+      photosListWrapper.append(renderPhoto(result));
+      renderPagination();
+      destroyModal();
+    };
+
+    uploadPhotoModal.classList.remove("hidden");
+    uploadPhotoForm.addEventListener("submit", handleFormSubmit);
+  };
+
+  const handleUploadPhotoInputChange = (evt) => {
+    renderUploadPhotoModal(evt.target.files[0]);
   };
 
   const handlePaginationItemClick = (evt) => {

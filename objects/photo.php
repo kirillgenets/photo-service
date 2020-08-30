@@ -7,6 +7,7 @@ class Photo {
 
   public $id;
   public $name;
+  public $hashtags;
   public $url;
   public $owner_id;
   public $users;
@@ -32,19 +33,18 @@ class Photo {
   }
 
   function create() {
-    $query = "INSERT INTO " . $this->table_name . " SET name=:name, url=:url, owner_id=:owner_id";
+    $query = "INSERT INTO " . $this->table_name . " SET name=:name, url=:url, owner_id=:owner_id, hashtags=:hashtags";
     $stmt = $this->connection->prepare($query);
 
-    $this->url = htmlspecialchars(strip_tags($this->url));
-    $this->owner_id = htmlspecialchars(strip_tags($this->owner_id));
-    $this->name = $this->default_photo_name;
+    $this->name = $this->name === '' ? $this->default_photo_name : $this->name;
 
     $stmt->bindParam(":url", $this->url);
     $stmt->bindParam(":owner_id", $this->owner_id);
     $stmt->bindParam(":name", $this->name);
+    $stmt->bindParam(":hashtags", $this->hashtags);
 
     if ($stmt->execute()) {
-      $id_query = "SELECT id, name, url FROM " . $this->table_name . " WHERE url='" . $this->url . "'";
+      $id_query = "SELECT id, name, url, hashtags FROM " . $this->table_name . " WHERE url='" . $this->url . "'";
       $id_stmt = $this->connection->prepare($id_query);
       $id_stmt->execute();
 

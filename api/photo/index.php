@@ -34,6 +34,15 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
       echo json_encode(array("error" => "Ошибка доступа."), JSON_UNESCAPED_UNICODE);
     }
   } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    function are_hashtags_correct() {
+      $hashtags_array = explode('#', $_POST['hashtags']);
+      $checked_array = array_filter($hashtags_array, function($hashtag) {
+        return !strpos($hashtag, ' ');
+      });
+
+      return count($checked_array) === count($hashtags_array) && strpos($_POST['hashtags'], '#') === 0;
+    }
+
     function get_validation_errors() {
       $photo_format = $_FILES['photo']['type'];
       $errors = [];
@@ -50,8 +59,12 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
         $errors['photo'] = "Фотография может быть только в форматах jpg, jpeg и png";
       }
 
-      if (filesize($_FILES['photo']['tmp_name']) > 1048576) {
+      if (filesize($_FILES['photo']['tmp_name']) > BYTES_IN_MEGABYTE) {
         $errors['photo'] = "Размер фотографии не должен превышать 1 МБ";
+      }
+
+      if (!empty($_POST['hashtags']) && !are_hashtags_correct()) {
+        $errors['hashtags'] = "Каждый хэштег должен начинаться с символа решетки. Пробелы между хэштегами не ставятся!";
       }
     
       return $errors;
@@ -66,6 +79,8 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
 
       $photo->url = 'http://photo-service/storage/' . $filename;
       $photo->owner_id = $_POST['id'];
+      $photo->hashtags = $_POST['hashtags'];
+      $photo->name = $_POST['name'];
       $result = $photo->create();
     
       if ($result !== false) {
@@ -114,7 +129,8 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
             "id" => $id,
             "name" => $name,
             "url" => $url,
-            "owner_id" => $owner_id
+            "owner_id" => $owner_id,
+            "hashtags" => $hashtags
         );
 
         array_push($photos_list, $photo_item);
