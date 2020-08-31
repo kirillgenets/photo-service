@@ -54,6 +54,27 @@ class Photo {
     return false;
   }
 
+  function update() {
+    $query = "UPDATE " . $this->table_name . " SET name=:name, hashtags=:hashtags WHERE id=" . $this->id . " AND owner_id=" . $this->owner_id;
+    $stmt = $this->connection->prepare($query);
+
+    $this->name = $this->name === '' ? $this->default_photo_name : $this->name;
+    $stmt->bindParam(":name", $this->name);
+    $stmt->bindParam(":hashtags", $this->hashtags);
+
+    if ($stmt->execute()) {
+      $id_query = "SELECT id, name, url, hashtags FROM " . $this->table_name . " WHERE id=" . $this->id;
+      $id_stmt = $this->connection->prepare($id_query);
+      $id_stmt->execute();
+
+      return $id_stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    var_dump($stmt->errorInfo());
+
+    return false;
+  }
+
   function is_deletable($id, $owner_id) {
     $query = "SELECT * FROM " . $this->table_name . " WHERE id=" . $id . " AND owner_id=" . $owner_id;
     $stmt = $this->connection->prepare($query);

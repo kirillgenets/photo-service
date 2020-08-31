@@ -1,7 +1,8 @@
 <?php
 
 header("Access-Control-Allow-Origin: *");
-header("Content-Type: multipart/form-data, application/json; charset=UTF-8");
+header("Content-Type: multipart/form-data; charset=UTF-8");
+header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST, GET, DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
@@ -13,6 +14,15 @@ session_start();
 
 const BYTES_IN_MEGABYTE = 1048576;
 const PAGE_SIZE = 6;
+
+function are_hashtags_correct($hashtags) {
+  $hashtags_array = explode('#', $hashtags);
+  $checked_array = array_filter($hashtags_array, function($hashtag) {
+    return !strpos($hashtag, ' ');
+  });
+
+  return count($checked_array) === count($hashtags_array) && strpos($hashtags, '#') === 0;
+}
 
 if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION['bearer_token']) {
   http_response_code(403);
@@ -33,16 +43,41 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
       http_response_code(403);
       echo json_encode(array("error" => "Ошибка доступа."), JSON_UNESCAPED_UNICODE);
     }
-  } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    function are_hashtags_correct() {
-      $hashtags_array = explode('#', $_POST['hashtags']);
-      $checked_array = array_filter($hashtags_array, function($hashtag) {
-        return !strpos($hashtag, ' ');
-      });
+  } else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['_method'] = 'patch' && empty($_FILES['photo'])) {
+    function get_validation_errors($data) {
+      $errors = [];
 
-      return count($checked_array) === count($hashtags_array) && strpos($_POST['hashtags'], '#') === 0;
+      if (!empty($data->hashtags) && !are_hashtags_correct($data->hashtags)) {
+        $errors['hashtags'] = "Каждый хэштег должен начинаться с символа решетки. Пробелы между хэштегами не ставятся!";
+      }
+
+      return $errors;
     }
 
+    $data = json_decode(file_get_contents("php://input"));
+
+    $validation_errors = get_validation_errors($data);
+
+    if (count($validation_errors) === 0) {
+      $photo->id = $data->id;
+      $photo->owner_id = $data->owner_id;
+      $photo->name = $data->name;
+      $photo->hashtags = $data->hashtags;
+
+      $result = $photo->update();
+
+      if ($result !== false) {
+        http_response_code(200);
+        echo json_encode($result, JSON_UNESCAPED_UNICODE);
+      } else {
+        http_response_code(503);
+        echo json_encode(array("error" => "Невозможно обновить фотографию."), JSON_UNESCAPED_UNICODE);
+      }
+    } else {
+      http_response_code(422);
+      echo json_encode($validation_errors, JSON_UNESCAPED_UNICODE);
+    }
+  } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     function get_validation_errors() {
       $photo_format = $_FILES['photo']['type'];
       $errors = [];
@@ -63,14 +98,14 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
         $errors['photo'] = "Размер фотографии не должен превышать 1 МБ";
       }
 
-      if (!empty($_POST['hashtags']) && !are_hashtags_correct()) {
+      if (!empty($_POST['hashtags']) && !are_hashtags_correct($_POST['hashtags'])) {
         $errors['hashtags'] = "Каждый хэштег должен начинаться с символа решетки. Пробелы между хэштегами не ставятся!";
       }
     
       return $errors;
     }
     
-    $validation_errors = get_validation_errors($data);
+    $validation_errors = get_validation_errors();
     
     if (count($validation_errors) === 0) {
       $filename = uniqid() . '_' . $_FILES['photo']['name'] . '.png';
@@ -95,6 +130,7 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
       echo json_encode($validation_errors, JSON_UNESCAPED_UNICODE);
     }
   } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['id'])) {
+    var_dump($_POST);
     $result = $photo->read_one($_GET['id'])->fetch(PDO::FETCH_ASSOC);
 
     if ($result !== false) {
@@ -111,31 +147,31 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
 
     $i = 1;
     $max_index = $_GET['page'] * PAGE_SIZE;
-    $min_index = $max_index - PAGE_SIZE;
+    $min_index = $max_index - PAGE_SIZE + 1;
 
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        if ($min_index && $i < $min_index) {
-          $i++;
-          continue;
-        }
-
-        if ($max_index && $i > $max_index) break;
-
-        extract($row);
-
-        if (!empty($_GET['owner_id']) && $_GET['owner_id'] !== $owner_id) continue;
-
-        $photo_item = array(
-            "id" => $id,
-            "name" => $name,
-            "url" => $url,
-            "owner_id" => $owner_id,
-            "hashtags" => $hashtags
-        );
-
-        array_push($photos_list, $photo_item);
-
+      if ($min_index && $i < $min_index) {
         $i++;
+        continue;
+      }
+
+      if ($max_index && $i > $max_index) break;
+
+      extract($row);
+
+      if (!empty($_GET['owner_id']) && $_GET['owner_id'] !== $owner_id) continue;
+
+      $photo_item = array(
+          "id" => $id,
+          "name" => $name,
+          "url" => $url,
+          "owner_id" => $owner_id,
+          "hashtags" => $hashtags
+      );
+
+      array_push($photos_list, $photo_item);
+
+      $i++;
     }
 
     http_response_code(200);

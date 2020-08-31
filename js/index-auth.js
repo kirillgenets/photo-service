@@ -4,6 +4,7 @@
   const USERS_URL = "api/user/";
   const POST_SUCCESS_STATUS = 201;
   const GET_SUCCESS_STATUS = 200;
+  const PATCH_SUCCESS_STATUS = 200;
   const DELETE_SUCCESS_STATUS = 204;
   const PHOTOS_PER_PAGE = 6;
   const HASHTAGS_ALTERNATIVE_TEXT = "Нет хэштегов";
@@ -14,6 +15,10 @@
   const uploadPhotoModal = document.querySelector(".upload-photo");
   const uploadPhotoForm = uploadPhotoModal.querySelector(".upload-photo__form");
   const uploadPhotoFormErrors = uploadPhotoForm.querySelector(".form__errors");
+
+  const updatePhotoModal = document.querySelector(".update-photo");
+  const updatePhotoForm = updatePhotoModal.querySelector(".update-photo__form");
+  const updatePhotoFormErrors = updatePhotoForm.querySelector(".form__errors");
 
   const photosListWrapper = photosWrapper.querySelector(".photos__list");
   const uploadPhotoInput = photosWrapper.querySelector(
@@ -44,8 +49,49 @@
     renderPagination();
   };
 
-  const handlePhotoEditButtonClick = (evt) => {
-    console.log("handlePhotoEditButtonClick -> evt", evt);
+  const renderUpdatePhotoModal = (id) => {
+    const destroyModal = () => {
+      updatePhotoModal.value = "";
+      updatePhotoModal.classList.add("hidden");
+    };
+
+    const handleFormSubmit = async (evt) => {
+      evt.preventDefault();
+      updatePhotoFormErrors.innerHTML = "";
+
+      const formData = new FormData(evt.target);
+
+      formData.append("owner_id", authData.id);
+      formData.append("id", id);
+
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=utf-8;",
+          ["Authorization"]: authData.token,
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      };
+
+      const response = await fetch(`${PHOTOS_URL}/${id}`, options);
+      const result = await response.json();
+
+      if (response.status !== PATCH_SUCCESS_STATUS) {
+        window.utils.renderValidationErrors(result, updatePhotoFormErrors);
+        return;
+      }
+
+      renderAllPhotos();
+      renderPagination();
+      destroyModal();
+    };
+
+    updatePhotoModal.classList.remove("hidden");
+    updatePhotoForm.addEventListener("submit", handleFormSubmit);
+  };
+
+  const handlePhotoEditButtonClick = (id) => () => {
+    renderUpdatePhotoModal(id);
   };
 
   const handlePhotoShareButtonClick = (evt) => {
@@ -69,7 +115,7 @@
       .addEventListener("click", handlePhotoDeleteButtonClick(id));
     element
       .querySelector(".photo__button--edit")
-      .addEventListener("click", handlePhotoEditButtonClick);
+      .addEventListener("click", handlePhotoEditButtonClick(id));
     element
       .querySelector(".photo__button--share")
       .addEventListener("click", handlePhotoShareButtonClick);
@@ -129,7 +175,7 @@
         return;
       }
 
-      photosListWrapper.append(renderPhoto(result));
+      renderAllPhotos();
       renderPagination();
       destroyModal();
     };
@@ -161,6 +207,11 @@
     const result = await response.json();
     const photosCount = result.length;
     const pagesCount = Math.ceil(photosCount / PHOTOS_PER_PAGE);
+    console.log(
+      "Math.ceil(photosCount / PHOTOS_PER_PAGE)",
+      Math.ceil(photosCount / PHOTOS_PER_PAGE)
+    );
+    console.log("photosCount / PHOTOS_PER_PAGE", photosCount / PHOTOS_PER_PAGE);
 
     if (!photosCount) return;
 

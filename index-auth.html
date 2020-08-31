@@ -16,11 +16,7 @@
     <main>
       <div class="upload-photo modal hidden">
         <h2>Загрузить фотографию</h2>
-        <form
-          class="upload-photo__form form"
-          action="api/photo/"
-          enctype="multipart/form-data"
-        >
+        <form class="upload-photo__form form" action="api/photo/" method="POST">
           <label class="form__label" for="upload-name"
             >Название фотографии</label
           >
@@ -32,10 +28,7 @@
             name="hashtags"
             id="upload-hashtags"
           />
-          <button
-            class="upload-photo__submit button button-smaller"
-            type="submit"
-          >
+          <button class="form__submit button button-smaller" type="submit">
             Загрузить
           </button>
           <ul class="form__errors"></ul>
@@ -43,29 +36,23 @@
       </div>
       <div class="update-photo modal hidden">
         <h2>Редактировать фотографию</h2>
-        <div class="update-photo__form">
-          <label for="update-name" class="update-photo__label"
+        <form class="update-photo__form form" action="api/photo/" method="POST">
+          <label class="form__label" for="update-name"
             >Название фотографии</label
           >
+          <input class="form__input" type="text" name="name" id="update-name" />
+          <label class="form__label" for="update-hashtags">Хештеги</label>
           <input
-            class="update-photo__input"
-            type="text"
-            name="name"
-            id="update-name"
-          />
-          <label for="update-hashtags" class="update-photo__label"
-            >Хештеги</label
-          >
-          <input
-            class="update-photo__input"
+            class="form__input"
             type="text"
             name="hashtags"
             id="update-hashtags"
           />
-          <button class="update-photo__submit button button-smaller">
+          <button class="form__submit button button-smaller" type="submit">
             Редактировать
           </button>
-        </div>
+          <ul class="form__errors"></ul>
+        </form>
       </div>
       <div class="share-modal modal hidden">
         <h2>Поделиться фотографией</h2>
