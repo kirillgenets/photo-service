@@ -57,18 +57,15 @@
       <div class="share-modal modal hidden">
         <h2>Поделиться фотографией</h2>
         <form class="share-modal__form" action="">
-          <input class="share-modal__search" type="text" />
-          <div class="share-modal__user">
-            <label class="share-modal__user-name" for="share-user"
-              >Василий Петров</label
-            >
-            <input
-              class="share-modal__user-checkbox"
-              type="checkbox"
-              name="share-user"
-              id="share-user"
-            />
-          </div>
+          <input
+            class="share-modal__search"
+            type="text"
+            placeholder="Поиск пользователя..."
+          />
+          <button class="share-modal__search-button button" type="button">
+            Искать
+          </button>
+          <div class="share-modal__users"></div>
           <button class="share-modal__submit button button-smaller">
             Поделиться
           </button>
@@ -111,6 +108,20 @@
         <button class="photo__button photo__button--share button--smaller">
           Поделиться
         </button>
+      </div>
+    </template>
+
+    <template id="share-photo-user">
+      <div class="share-modal__user">
+        <label class="share-modal__user-name" for="share-user"
+          >Василий Петров</label
+        >
+        <input
+          class="share-modal__user-checkbox"
+          type="checkbox"
+          name="user"
+          id="share-user"
+        />
       </div>
     </template>
 

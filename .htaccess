@@ -10,5 +10,6 @@ RewriteRule ^api/photo/(\d+)/$ /api/photo/?id=$1&owner_id=%1 [L,R=301]
 
 RewriteRule ^api/photo/(\d+)$ /api/photo/?id=$1 [L,R=301]
 
-RewriteRule ^api/user/(\d+)/share$ /api/user/?id=$1 [L,R=301]
+RewriteCond %{REQUEST_METHOD} =POST
+RewriteRule ^api/user/(\d+)/share$ /api/user/?id=$1
 SetEnvIf Authorization "(.*)" Authorization=$1

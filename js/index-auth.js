@@ -10,6 +10,8 @@
   const HASHTAGS_ALTERNATIVE_TEXT = "Нет хэштегов";
 
   const photoTemplate = document.querySelector("#photo");
+  const sharePhotoUserTemplate = document.querySelector("#share-photo-user");
+
   const photosWrapper = document.querySelector(".photos");
 
   const uploadPhotoModal = document.querySelector(".upload-photo");
@@ -19,6 +21,19 @@
   const updatePhotoModal = document.querySelector(".update-photo");
   const updatePhotoForm = updatePhotoModal.querySelector(".update-photo__form");
   const updatePhotoFormErrors = updatePhotoForm.querySelector(".form__errors");
+
+  const sharePhotoModal = document.querySelector(".share-modal");
+  const sharePhotoForm = sharePhotoModal.querySelector(".share-modal__form");
+  const sharePhotoUserSearchInput = sharePhotoForm.querySelector(
+    ".share-modal__search"
+  );
+  const sharePhotoUserSearchButton = sharePhotoForm.querySelector(
+    ".share-modal__search-button"
+  );
+
+  const sharePhotoUsersList = sharePhotoForm.querySelector(
+    ".share-modal__users"
+  );
 
   const photosListWrapper = photosWrapper.querySelector(".photos__list");
   const uploadPhotoInput = photosWrapper.querySelector(
@@ -50,11 +65,6 @@
   };
 
   const renderUpdatePhotoModal = (id) => {
-    const destroyModal = () => {
-      updatePhotoModal.value = "";
-      updatePhotoModal.classList.add("hidden");
-    };
-
     const handleFormSubmit = async (evt) => {
       evt.preventDefault();
       updatePhotoFormErrors.innerHTML = "";
@@ -83,7 +93,8 @@
 
       renderAllPhotos();
       renderPagination();
-      destroyModal();
+
+      updatePhotoModal.classList.add("hidden");
     };
 
     updatePhotoModal.classList.remove("hidden");
@@ -94,15 +105,69 @@
     renderUpdatePhotoModal(id);
   };
 
-  const handlePhotoShareButtonClick = (evt) => {
-    // const response = await fetch(`${USERS_URL}/${id}/share`, {
-    //   method: "POST",
-    //   body: {}
-    // });
+  const renderSharePhotoModal = (id) => {
+    const renderUser = ({ first_name: firstName, surname, id }) => {
+      const userElement = sharePhotoUserTemplate.content.cloneNode(true);
 
-    // if (response.status !== DELETE_SUCCESS_STATUS) return;
-    // evt.target.remove();
-    console.log("handlePhotoShareButtonClick -> evt", evt);
+      userElement.querySelector(".share-modal__user-checkbox").value = id;
+      userElement.querySelector(
+        ".share-modal__user-name"
+      ).textContent = `${firstName} ${surname}`;
+
+      return userElement;
+    };
+
+    const renderUsers = async () => {
+      const response = await fetch(`${USERS_URL}`, {
+        method: "GET",
+        headers: {
+          ["Authorization"]: authData.token,
+        },
+      });
+
+      const result = await response.json();
+
+      if (response.status !== GET_SUCCESS_STATUS) return;
+
+      sharePhotoUsersList.innerHTML = "";
+      sharePhotoUsersList.append(...result.map(renderUser));
+    };
+
+    const handleSharePhotoUserSearchButtonClick = async () => {
+      const search = sharePhotoUserSearchInput.value;
+      const response = await fetch(`${USERS_URL}/?search=${search}`, {
+        method: "GET",
+        headers: {
+          ["Authorization"]: authData.token,
+        },
+      });
+
+      const result = await response.json();
+      if (response.status !== GET_SUCCESS_STATUS) return;
+    };
+
+    const handleSharePhotoFormSubmit = () => {
+      // const response = await fetch(`${USERS_URL}/${authData.id}/share`, {
+      //   method: "POST",
+      //   body: {},
+      // });
+      // console.log(
+      //   "handlePhotoShareButtonClick -> response",
+      //   await response.text()
+      // );
+    };
+    renderUsers();
+
+    sharePhotoModal.classList.remove("hidden");
+    sharePhotoForm.addEventListener("submit", handleSharePhotoFormSubmit);
+    sharePhotoUserSearchButton.addEventListener(
+      "click",
+      handleSharePhotoUserSearchButtonClick
+    );
+  };
+
+  const handlePhotoShareButtonClick = (id) => async () => {
+    renderSharePhotoModal(id);
   };
 
   const handlePhotoTitleChange = (evt) => {
@@ -118,7 +183,7 @@
       .addEventListener("click", handlePhotoEditButtonClick(id));
     element
       .querySelector(".photo__button--share")
-      .addEventListener("click", handlePhotoShareButtonClick);
+      .addEventListener("click", handlePhotoShareButtonClick(id));
     element
       .querySelector(".photo__title")
       .addEventListener("change", handlePhotoTitleChange);
@@ -207,11 +272,6 @@
     const result = await response.json();
     const photosCount = result.length;
     const pagesCount = Math.ceil(photosCount / PHOTOS_PER_PAGE);
-    console.log(
-      "Math.ceil(photosCount / PHOTOS_PER_PAGE)",
-      Math.ceil(photosCount / PHOTOS_PER_PAGE)
-    );
-    console.log("photosCount / PHOTOS_PER_PAGE", photosCount / PHOTOS_PER_PAGE);
 
     if (!photosCount) return;
 

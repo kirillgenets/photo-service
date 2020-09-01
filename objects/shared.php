@@ -21,6 +21,8 @@ class Shared {
   }
 
   function create() {
+    if ($this->exists()) return false;
+
     $query = "INSERT INTO " . $this->table_name . " SET photo_id=:photo_id, user_id=:user_id";
     $stmt = $this->connection->prepare($query);
 
@@ -28,6 +30,14 @@ class Shared {
     $stmt->bindParam(":user_id", $this->user_id);
 
     return $stmt->execute();
+  }
+
+  function exists() {
+    $query = "SELECT * FROM " . $this->table_name . " WHERE user_id=" . $this->user_id . "AND photo_id=" . $this->photo_id;
+    $stmt = $this->connection->prepare($query);
+    $stmt->execute();
+
+    return $stmt->rowCount() > 0;
   }
 }
 
