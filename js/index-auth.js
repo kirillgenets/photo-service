@@ -16,23 +16,26 @@
 
   const uploadPhotoModal = document.querySelector(".upload-photo");
   const uploadPhotoForm = uploadPhotoModal.querySelector(".upload-photo__form");
-  const uploadPhotoFormErrors = uploadPhotoForm.querySelector(".form__errors");
+  const uploadPhotoFormErrors = uploadPhotoForm.querySelector(".errors");
 
   const updatePhotoModal = document.querySelector(".update-photo");
   const updatePhotoForm = updatePhotoModal.querySelector(".update-photo__form");
-  const updatePhotoFormErrors = updatePhotoForm.querySelector(".form__errors");
+  const updatePhotoFormErrors = updatePhotoForm.querySelector(".errors");
 
   const sharePhotoModal = document.querySelector(".share-modal");
   const sharePhotoForm = sharePhotoModal.querySelector(".share-modal__form");
+  const sharePhotoFormErrors = sharePhotoForm.querySelector(".errors");
   const sharePhotoUserSearchInput = sharePhotoForm.querySelector(
     ".share-modal__search"
   );
   const sharePhotoUserSearchButton = sharePhotoForm.querySelector(
     ".share-modal__search-button"
   );
-
   const sharePhotoUsersList = sharePhotoForm.querySelector(
     ".share-modal__users"
+  );
+  const sharePhotoModalCloseButton = sharePhotoModal.querySelector(
+    ".share-modal__close"
   );
 
   const photosListWrapper = photosWrapper.querySelector(".photos__list");
@@ -67,7 +70,6 @@
   const renderUpdatePhotoModal = (id) => {
     const handleFormSubmit = async (evt) => {
       evt.preventDefault();
-      updatePhotoFormErrors.innerHTML = "";
 
       const formData = new FormData(evt.target);
 
@@ -95,6 +97,8 @@
       renderPagination();
 
       updatePhotoModal.classList.add("hidden");
+      updatePhotoForm.reset();
+      updatePhotoForm.removeEventListener("submit", handleFormSubmit);
     };
 
     updatePhotoModal.classList.remove("hidden");
@@ -106,10 +110,28 @@
   };
 
   const renderSharePhotoModal = (id) => {
+    const destroyModal = () => {
+      sharePhotoModal.classList.add("hidden");
+      sharePhotoForm.reset();
+
+      sharePhotoUsersList.innerHTML = "";
+      sharePhotoFormErrors.innerHTML = "";
+
+      sharePhotoForm.removeEventListener("submit", handleSharePhotoFormSubmit);
+      sharePhotoUserSearchButton.removeEventListener(
+        "click",
+        handleSharePhotoUserSearchButtonClick
+      );
+      sharePhotoModalCloseButton.removeEventListener(
+        "click",
+        handleShareModalCloseButtonClick
+      );
+    };
+
     const renderUser = ({ first_name: firstName, surname, id }) => {
       const userElement = sharePhotoUserTemplate.content.cloneNode(true);
 
-      userElement.querySelector(".share-modal__user-checkbox").value = id;
+      userElement.querySelector(".share-modal__user-radio").value = id;
       userElement.querySelector(
         ".share-modal__user-name"
       ).textContent = `${firstName} ${surname}`;
@@ -117,7 +139,7 @@
       return userElement;
     };
 
-    const renderUsers = async () => {
+    const renderAllUsers = async () => {
       const response = await fetch(`${USERS_URL}`, {
         method: "GET",
         headers: {
@@ -143,26 +165,55 @@
       });
 
       const result = await response.json();
+
       if (response.status !== GET_SUCCESS_STATUS) return;
+
+      sharePhotoUsersList.innerHTML = "";
+      sharePhotoUsersList.append(...result.map(renderUser));
     };
 
-    const handleSharePhotoFormSubmit = () => {
-      // const response = await fetch(`${USERS_URL}/${authData.id}/share`, {
-      //   method: "POST",
-      //   body: {},
-      // });
-      // console.log(
-      //   "handlePhotoShareButtonClick -> response",
-      //   await response.text()
-      // );
+    const handleSharePhotoFormSubmit = async (evt) => {
+      evt.preventDefault();
+
+      const formData = new FormData(sharePhotoForm);
+
+      const response = await fetch(
+        `${USERS_URL}/${formData.get("user") || Number.MAX_SAFE_INTEGER}/share`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            ...Object.fromEntries(formData),
+            photos: [id],
+          }),
+        }
+      );
+
+      if (response.status !== POST_SUCCESS_STATUS) {
+        window.utils.renderValidationErrors(
+          await response.json(),
+          sharePhotoFormErrors
+        );
+        return;
+      }
+
+      destroyModal();
     };
-    renderUsers();
+
+    const handleShareModalCloseButtonClick = () => {
+      destroyModal();
+    };
+
+    renderAllUsers();
 
     sharePhotoModal.classList.remove("hidden");
     sharePhotoForm.addEventListener("submit", handleSharePhotoFormSubmit);
     sharePhotoUserSearchButton.addEventListener(
       "click",
       handleSharePhotoUserSearchButtonClick
+    );
+    sharePhotoModalCloseButton.addEventListener(
+      "click",
+      handleShareModalCloseButtonClick
     );
   };
 
@@ -210,11 +261,13 @@
     const destroyModal = () => {
       uploadPhotoInput.value = "";
       uploadPhotoModal.classList.add("hidden");
+
+      uploadPhotoForm.reset();
+      uploadPhotoForm.removeEventListener("submit", handleFormSubmit);
     };
 
     const handleFormSubmit = async (evt) => {
       evt.preventDefault();
-      uploadPhotoFormErrors.innerHTML = "";
 
       const formData = new FormData(evt.target);
 

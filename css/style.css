@@ -110,7 +110,7 @@ body {
   color: #ffffff;
 }
 
-.form__error {
+.error {
   margin: 0;
   color: red;
 }

@@ -4,13 +4,12 @@
   const SUCCESS_STATUS = 201;
 
   const formElement = document.querySelector(".sign-up-form");
-  const errorsListElement = formElement.querySelector(".form__errors");
+  const errorsListElement = formElement.querySelector(".errors");
 
   const handleFormSubmit = async (evt) => {
     evt.preventDefault();
 
     errorsListElement.classList.add("hidden");
-    errorsListElement.innerHTML = "";
 
     const response = await fetch(URL, {
       method: "POST",

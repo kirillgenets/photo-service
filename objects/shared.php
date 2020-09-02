@@ -33,7 +33,7 @@ class Shared {
   }
 
   function exists() {
-    $query = "SELECT * FROM " . $this->table_name . " WHERE user_id=" . $this->user_id . "AND photo_id=" . $this->photo_id;
+    $query = "SELECT * FROM " . $this->table_name . " WHERE user_id=" . $this->user_id . " AND photo_id=" . $this->photo_id;
     $stmt = $this->connection->prepare($query);
     $stmt->execute();
 

@@ -31,7 +31,7 @@
           <button class="form__submit button button-smaller" type="submit">
             Загрузить
           </button>
-          <ul class="form__errors"></ul>
+          <ul class="errors"></ul>
         </form>
       </div>
       <div class="update-photo modal hidden">
@@ -51,12 +51,13 @@
           <button class="form__submit button button-smaller" type="submit">
             Редактировать
           </button>
-          <ul class="form__errors"></ul>
+          <ul class="errors"></ul>
         </form>
       </div>
       <div class="share-modal modal hidden">
+        <button class="share-modal__close button">Закрыть</button>
         <h2>Поделиться фотографией</h2>
-        <form class="share-modal__form" action="">
+        <form class="share-modal__form" action="api/user/">
           <input
             class="share-modal__search"
             type="text"
@@ -69,6 +70,7 @@
           <button class="share-modal__submit button button-smaller">
             Поделиться
           </button>
+          <ul class="errors"></ul>
         </form>
       </div>
       <div class="photos">
@@ -117,8 +119,8 @@
           >Василий Петров</label
         >
         <input
-          class="share-modal__user-checkbox"
-          type="checkbox"
+          class="share-modal__user-radio"
+          type="radio"
           name="user"
           id="share-user"
         />
