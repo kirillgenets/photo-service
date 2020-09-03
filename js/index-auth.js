@@ -17,10 +17,16 @@
   const uploadPhotoModal = document.querySelector(".upload-photo");
   const uploadPhotoForm = uploadPhotoModal.querySelector(".upload-photo__form");
   const uploadPhotoFormErrors = uploadPhotoForm.querySelector(".errors");
+  const uploadPhotoModalCloseButton = uploadPhotoModal.querySelector(
+    ".upload-photo__close"
+  );
 
   const updatePhotoModal = document.querySelector(".update-photo");
   const updatePhotoForm = updatePhotoModal.querySelector(".update-photo__form");
   const updatePhotoFormErrors = updatePhotoForm.querySelector(".errors");
+  const updatePhotoModalCloseButton = updatePhotoModal.querySelector(
+    ".update-photo__close"
+  );
 
   const sharePhotoModal = document.querySelector(".share-modal");
   const sharePhotoForm = sharePhotoModal.querySelector(".share-modal__form");
@@ -44,7 +50,7 @@
   );
   const paginationWrapper = photosWrapper.querySelector(".photos__pagination");
 
-  const exitButton = document.querySelector(".header__exit-button");
+  const exitButton = document.querySelector(".header__button--exit");
 
   const authData = JSON.parse(localStorage.getItem("auth"));
   let currentPage = 1;
@@ -53,7 +59,7 @@
 
   const handlePhotoDeleteButtonClick = (id) => async (evt) => {
     const response = await fetch(
-      `${PHOTOS_URL}/${id}/?owner_id=${authData.id}`,
+      `${PHOTOS_URL}/${id}/?user_id=${authData.id}`,
       {
         method: "DELETE",
         headers: {
@@ -68,6 +74,19 @@
   };
 
   const renderUpdatePhotoModal = (id) => {
+    const destroyModal = () => {
+      updatePhotoModal.classList.add("hidden");
+      updatePhotoForm.reset();
+
+      updatePhotoFormErrors.innerHTML = "";
+
+      updatePhotoModalCloseButton.removeEventListener(
+        "click",
+        handleUpdatePhotoModalCloseButton
+      );
+      updatePhotoForm.removeEventListener("submit", handleFormSubmit);
+    };
+
     const handleFormSubmit = async (evt) => {
       evt.preventDefault();
 
@@ -95,14 +114,19 @@
 
       renderAllPhotos();
       renderPagination();
+      destroyModal();
+    };
 
-      updatePhotoModal.classList.add("hidden");
-      updatePhotoForm.reset();
-      updatePhotoForm.removeEventListener("submit", handleFormSubmit);
+    const handleUpdatePhotoModalCloseButton = () => {
+      destroyModal();
     };
 
     updatePhotoModal.classList.remove("hidden");
     updatePhotoForm.addEventListener("submit", handleFormSubmit);
+    updatePhotoModalCloseButton.addEventListener(
+      "click",
+      handleUpdatePhotoModalCloseButton
+    );
   };
 
   const handlePhotoEditButtonClick = (id) => () => {
@@ -181,6 +205,9 @@
         `${USERS_URL}/${formData.get("user") || Number.MAX_SAFE_INTEGER}/share`,
         {
           method: "POST",
+          headers: {
+            ["Authorization"]: authData.token,
+          },
           body: JSON.stringify({
             ...Object.fromEntries(formData),
             photos: [id],
@@ -221,49 +248,19 @@
     renderSharePhotoModal(id);
   };
 
-  const handlePhotoTitleChange = (evt) => {
-    console.log("handlePhotoTitleChange -> evt", evt);
-  };
-
-  const setPhotoEventListeners = (element, id) => {
-    element
-      .querySelector(".photo__button--delete")
-      .addEventListener("click", handlePhotoDeleteButtonClick(id));
-    element
-      .querySelector(".photo__button--edit")
-      .addEventListener("click", handlePhotoEditButtonClick(id));
-    element
-      .querySelector(".photo__button--share")
-      .addEventListener("click", handlePhotoShareButtonClick(id));
-    element
-      .querySelector(".photo__title")
-      .addEventListener("change", handlePhotoTitleChange);
-  };
-
-  const renderPhoto = ({ id, name, url, hashtags }) => {
-    const wrapper = photoTemplate.content.cloneNode(true);
-    const thumbnailElement = wrapper.querySelector(".photo__thumbnail");
-    const titleElement = wrapper.querySelector(".photo__title");
-    const hashtagsElement = wrapper.querySelector(".photo__hashtags");
-
-    thumbnailElement.src = url;
-    thumbnailElement.alt = name;
-
-    titleElement.textContent = name;
-    hashtagsElement.textContent = hashtags || HASHTAGS_ALTERNATIVE_TEXT;
-
-    setPhotoEventListeners(wrapper, id);
-
-    return wrapper;
-  };
-
   const renderUploadPhotoModal = (photo) => {
     const destroyModal = () => {
       uploadPhotoInput.value = "";
       uploadPhotoModal.classList.add("hidden");
 
+      uploadPhotoFormErrors.innerHTML = "";
+
       uploadPhotoForm.reset();
       uploadPhotoForm.removeEventListener("submit", handleFormSubmit);
+      uploadPhotoModalCloseButton.removeEventListener(
+        "click",
+        handleUploadPhotoModalCloseButton
+      );
     };
 
     const handleFormSubmit = async (evt) => {
@@ -298,8 +295,16 @@
       destroyModal();
     };
 
+    const handleUploadPhotoModalCloseButton = () => {
+      destroyModal();
+    };
+
     uploadPhotoModal.classList.remove("hidden");
     uploadPhotoForm.addEventListener("submit", handleFormSubmit);
+    uploadPhotoModalCloseButton.addEventListener(
+      "click",
+      handleUploadPhotoModalCloseButton
+    );
   };
 
   const handleUploadPhotoInputChange = (evt) => {
@@ -316,7 +321,7 @@
   const renderPagination = async () => {
     paginationWrapper.innerHTML = "";
 
-    const response = await fetch(`${PHOTOS_URL}/?owner_id=${authData.id}`, {
+    const response = await fetch(`${PHOTOS_URL}/?user_id=${authData.id}`, {
       method: "GET",
       headers: {
         ["Authorization"]: authData.token,
@@ -349,11 +354,48 @@
     paginationWrapper.append(paginationWrapperFragment);
   };
 
+  const setPhotoEventListeners = (element, id) => {
+    element
+      .querySelector(".photo__button--delete")
+      .addEventListener("click", handlePhotoDeleteButtonClick(id));
+    element
+      .querySelector(".photo__button--edit")
+      .addEventListener("click", handlePhotoEditButtonClick(id));
+    element
+      .querySelector(".photo__button--share")
+      .addEventListener("click", handlePhotoShareButtonClick(id));
+  };
+
+  const renderPhoto = ({ id, name, url, hashtags, owner_id }) => {
+    const wrapper = photoTemplate.content.cloneNode(true);
+    const thumbnailElement = wrapper.querySelector(".photo__thumbnail");
+    const titleElement = wrapper.querySelector(".photo__title");
+    const hashtagsElement = wrapper.querySelector(".photo__hashtags");
+
+    thumbnailElement.src = url;
+    thumbnailElement.alt = name;
+
+    titleElement.textContent = name;
+    hashtagsElement.textContent = hashtags || HASHTAGS_ALTERNATIVE_TEXT;
+
+    if (authData.id !== owner_id) {
+      wrapper.querySelector(".photo__button--delete").classList.add("hidden");
+      wrapper.querySelector(".photo__button--edit").classList.add("hidden");
+      wrapper.querySelector(".photo__button--share").classList.add("hidden");
+
+      return wrapper;
+    }
+
+    setPhotoEventListeners(wrapper, id);
+
+    return wrapper;
+  };
+
   const renderAllPhotos = async () => {
     photosListWrapper.innerHTML = "";
 
     const response = await fetch(
-      `${PHOTOS_URL}/?page=${currentPage}&owner_id=${authData.id}`,
+      `${PHOTOS_URL}/?page=${currentPage}&user_id=${authData.id}`,
       {
         method: "GET",
         headers: {

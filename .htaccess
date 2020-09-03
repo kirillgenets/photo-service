@@ -5,8 +5,8 @@ RewriteBase /
 RewriteCond %{REQUEST_METHOD} =POST
 RewriteRule ^api/photo/(\d+)$ /api/photo/index.php
 
-RewriteCond %{QUERY_STRING} owner_id=(.*)
-RewriteRule ^api/photo/(\d+)/$ /api/photo/?id=$1&owner_id=%1 [L,R=301]
+RewriteCond %{QUERY_STRING} user_id=(.*)
+RewriteRule ^api/photo/(\d+)/$ /api/photo/?id=$1&user_id=%1 [L,R=301]
 
 RewriteRule ^api/photo/(\d+)$ /api/photo/?id=$1 [L,R=301]
 

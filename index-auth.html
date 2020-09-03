@@ -10,11 +10,22 @@
     <!-- Шапка -->
     <header class="header">
       <h1 class="header__title">Фотосервис</h1>
-      <button class="header__exit-button button">Выход</button>
+      <nav class="header__nav">
+        <div class="header__nav-item">
+          <button class="header__button--exit button">Выход</button>
+        </div>
+        <div class="header__nav-item">
+          <button class="header__button button">Мои фото</button>
+        </div>
+        <div class="header__nav-item">
+          <button class="header__button button">Расшаренные фото</button>
+        </div>
+      </nav>
     </header>
     <!-- Конец шапки -->
     <main>
       <div class="upload-photo modal hidden">
+        <button class="upload-photo__close button">Закрыть</button>
         <h2>Загрузить фотографию</h2>
         <form class="upload-photo__form form" action="api/photo/" method="POST">
           <label class="form__label" for="upload-name"
@@ -35,6 +46,7 @@
         </form>
       </div>
       <div class="update-photo modal hidden">
+        <button class="update-photo__close button">Закрыть</button>
         <h2>Редактировать фотографию</h2>
         <form class="update-photo__form form" action="api/photo/" method="POST">
           <label class="form__label" for="update-name"

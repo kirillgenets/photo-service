@@ -9,6 +9,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 include_once '../../config/database.php';
 include_once '../../objects/photo.php';
+include_once '../../objects/shared.php';
 
 session_start();
 
@@ -32,9 +33,10 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
   $db = $database->getConnection();
 
   $photo = new Photo($db);
+  $shared = new Shared($db);
 
-  if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && !empty($_GET['id']) && !empty($_GET['owner_id'])) {
-    $result = $photo->delete($_GET['id'], $_GET['owner_id']);
+  if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && !empty($_GET['id']) && !empty($_GET['user_id'])) {
+    $result = $photo->delete($_GET['id'], $_GET['user_id']);
 
     if ($result !== false) {
       http_response_code(204);
@@ -130,7 +132,6 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
       echo json_encode($validation_errors, JSON_UNESCAPED_UNICODE);
     }
   } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && !empty($_GET['id'])) {
-    var_dump($_POST);
     $result = $photo->read_one($_GET['id'])->fetch(PDO::FETCH_ASSOC);
 
     if ($result !== false) {
@@ -142,7 +143,8 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
     }
   } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt = $photo->read();
-
+    $shared->user_id = $_GET['user_id'];
+    $shared_photos_list = $shared->read_by_user()->fetchAll(PDO::FETCH_COLUMN, 2);
     $photos_list = array();
 
     $i = 1;
@@ -159,7 +161,7 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
 
       extract($row);
 
-      if (!empty($_GET['owner_id']) && $_GET['owner_id'] !== $owner_id) continue;
+      if (!empty($_GET['user_id']) && $_GET['user_id'] !== $owner_id && !in_array($id, $shared_photos_list)) continue;
 
       $photo_item = array(
           "id" => $id,

@@ -12,8 +12,16 @@ class Shared {
       $this->connection = $db;
   }
 
-  function read($photo_id) {
-    $query = "SELECT * FROM " . $this->table_name . " WHERE photo_id=" . $photo_id;
+  function read_by_photo() {
+    $query = "SELECT * FROM " . $this->table_name . " WHERE photo_id=" . $this->user_id;
+    $stmt = $this->connection->prepare($query);
+    $stmt->execute();
+
+    return $stmt;
+  }
+
+  function read_by_user() {
+    $query = "SELECT * FROM " . $this->table_name . " WHERE user_id=" . $this->user_id;
     $stmt = $this->connection->prepare($query);
     $stmt->execute();
 

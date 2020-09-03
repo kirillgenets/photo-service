@@ -21,6 +21,8 @@ $shared = new Shared($db);
 $photo = new Photo($db);
 
 if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION['bearer_token']) {
+  var_dump($_SERVER['Authorization']);
+  var_dump($_SESSION['bearer_token']);
   http_response_code(403);
   echo json_encode(array("error" => "Ошибка доступа."), JSON_UNESCAPED_UNICODE);
 } else {
