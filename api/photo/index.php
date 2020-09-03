@@ -145,6 +145,7 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
     $stmt = $photo->read();
     $shared->user_id = $_GET['user_id'];
     $shared_photos_list = $shared->read_by_user()->fetchAll(PDO::FETCH_COLUMN, 2);
+
     $photos_list = array();
 
     $i = 1;
@@ -163,12 +164,15 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
 
       if (!empty($_GET['user_id']) && $_GET['user_id'] !== $owner_id && !in_array($id, $shared_photos_list)) continue;
 
+      $shared->photo_id = $id;
+
       $photo_item = array(
           "id" => $id,
           "name" => $name,
           "url" => $url,
           "owner_id" => $owner_id,
-          "hashtags" => $hashtags
+          "hashtags" => $hashtags,
+          "users" => $shared->read_by_photo()->fetchAll(PDO::FETCH_COLUMN, 1),
       );
 
       array_push($photos_list, $photo_item);

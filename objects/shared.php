@@ -13,7 +13,7 @@ class Shared {
   }
 
   function read_by_photo() {
-    $query = "SELECT * FROM " . $this->table_name . " WHERE photo_id=" . $this->user_id;
+    $query = "SELECT * FROM " . $this->table_name . " WHERE photo_id=" . $this->photo_id;
     $stmt = $this->connection->prepare($query);
     $stmt->execute();
 
