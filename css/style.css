@@ -72,6 +72,17 @@ body {
   color: #ffffff;
 }
 
+.header__nav {
+  display: flex;
+  justify-content: space-around;
+}
+
+.header__button {
+  width: 15vw;
+
+  word-wrap: break-word;
+}
+
 /* Меню авторизации */
 
 .auth-menu {

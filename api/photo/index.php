@@ -142,9 +142,10 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
       echo json_encode(array("error" => "Нет фотографии с таким идентификатором!"), JSON_UNESCAPED_UNICODE);
     }
   } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $stmt = $photo->read();
+    $photos = $photo->read();
     $shared->user_id = $_GET['user_id'];
     $shared_photos_list = $shared->read_by_user()->fetchAll(PDO::FETCH_COLUMN, 2);
+    $all_shared_photos_ids = $shared->read_all()->fetchAll(PDO::FETCH_COLUMN, 2);
 
     $photos_list = array();
 
@@ -152,7 +153,7 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
     $max_index = $_GET['page'] * PAGE_SIZE;
     $min_index = $max_index - PAGE_SIZE + 1;
 
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    while ($row = $photos->fetch(PDO::FETCH_ASSOC)) {
       if ($min_index && $i < $min_index) {
         $i++;
         continue;
@@ -163,6 +164,7 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
       extract($row);
 
       if (!empty($_GET['user_id']) && $_GET['user_id'] !== $owner_id && !in_array($id, $shared_photos_list)) continue;
+      if ($_GET['show_shared'] == true && !empty($_GET['user_id']) && ($_GET['user_id'] !== $owner_id || !in_array($id, $all_shared_photos_ids))) continue;
 
       $shared->photo_id = $id;
 

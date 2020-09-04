@@ -50,7 +50,14 @@
   );
   const paginationWrapper = photosWrapper.querySelector(".photos__pagination");
 
-  const exitButton = document.querySelector(".header__button--exit");
+  const headerNavWrapper = document.querySelector(".header__nav");
+  const exitButton = headerNavWrapper.querySelector(".header__button--exit");
+  const showMyPhotosButton = headerNavWrapper.querySelector(
+    ".header__button--my-photos"
+  );
+  const showSharedByMePhotosButton = headerNavWrapper.querySelector(
+    ".header__button--my-shared-photos"
+  );
 
   const authData = JSON.parse(localStorage.getItem("auth"));
   let currentPage = 1;
@@ -318,15 +325,20 @@
     renderAllPhotos();
   };
 
-  const renderPagination = async () => {
+  const renderPagination = async (showShared = false) => {
     paginationWrapper.innerHTML = "";
 
-    const response = await fetch(`${PHOTOS_URL}/?user_id=${authData.id}`, {
-      method: "GET",
-      headers: {
-        ["Authorization"]: authData.token,
-      },
-    });
+    const response = await fetch(
+      `${PHOTOS_URL}/?user_id=${authData.id}${
+        showShared ? "&show_shared=true" : ""
+      }`,
+      {
+        method: "GET",
+        headers: {
+          ["Authorization"]: authData.token,
+        },
+      }
+    );
     const result = await response.json();
     const photosCount = result.length;
     const pagesCount = Math.ceil(photosCount / PHOTOS_PER_PAGE);
@@ -351,6 +363,7 @@
       paginationWrapperFragment.append(paginationItemElement);
     }
 
+    paginationWrapper.innerHTML = "";
     paginationWrapper.append(paginationWrapperFragment);
   };
 
@@ -391,11 +404,13 @@
     return wrapper;
   };
 
-  const renderAllPhotos = async () => {
+  const renderAllPhotos = async (showShared = false) => {
     photosListWrapper.innerHTML = "";
 
     const response = await fetch(
-      `${PHOTOS_URL}/?page=${currentPage}&user_id=${authData.id}`,
+      `${PHOTOS_URL}/?page=${currentPage}&user_id=${authData.id}${
+        showShared ? "&show_shared=true" : ""
+      }`,
       {
         method: "GET",
         headers: {
@@ -410,6 +425,8 @@
     const photosListWrapperFragment = document.createDocumentFragment();
 
     photosListWrapperFragment.append(...data.map(renderPhoto));
+
+    photosListWrapper.innerHTML = "";
     photosListWrapper.append(photosListWrapperFragment);
   };
 
@@ -418,9 +435,24 @@
     window.location.replace(SIGN_IN_URL);
   };
 
+  const handleShowMyPhotosButtonClick = () => {
+    renderAllPhotos();
+    renderPagination();
+  };
+
+  const handleShowSharedByMePhotosButtonClick = () => {
+    renderAllPhotos(true);
+    renderPagination(true);
+  };
+
   renderAllPhotos();
   renderPagination();
 
   uploadPhotoInput.addEventListener("change", handleUploadPhotoInputChange);
   exitButton.addEventListener("click", handleExitButtonClick);
+  showMyPhotosButton.addEventListener("click", handleShowMyPhotosButtonClick);
+  showSharedByMePhotosButton.addEventListener(
+    "click",
+    handleShowSharedByMePhotosButtonClick
+  );
 })();
