@@ -10,11 +10,13 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 include_once '../../config/database.php';
 include_once '../../objects/photo.php';
 include_once '../../objects/shared.php';
+include_once '../../utils/is_matches_search.php';
 
 session_start();
 
 const BYTES_IN_MEGABYTE = 1048576;
 const PAGE_SIZE = 6;
+const MIN_SEARCH_WORD_LENGTH = 3;
 
 function are_hashtags_correct($hashtags) {
   $hashtags_array = explode('#', $hashtags);
@@ -165,6 +167,7 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
 
       if (!empty($_GET['user_id']) && $_GET['user_id'] !== $owner_id && !in_array($id, $shared_photos_list)) continue;
       if ($_GET['show_shared'] == true && !empty($_GET['user_id']) && ($_GET['user_id'] !== $owner_id || !in_array($id, $all_shared_photos_ids))) continue;
+      if (!is_matches_search($name, $_GET['search'], MIN_SEARCH_WORD_LENGTH) && !is_matches_search($hashtags, $_GET['search'], MIN_SEARCH_WORD_LENGTH)) continue;
 
       $shared->photo_id = $id;
 
@@ -183,7 +186,7 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
     }
 
     http_response_code(200);
-    echo json_encode($photos_list);
+    echo json_encode($photos_list, JSON_UNESCAPED_UNICODE);
   }
 }
 

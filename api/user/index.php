@@ -10,6 +10,7 @@ include_once '../../config/database.php';
 include_once '../../objects/user.php';
 include_once '../../objects/photo.php';
 include_once '../../objects/shared.php';
+include_once '../../utils/is_matches_search.php';
 
 session_start();
 
@@ -49,19 +50,6 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
       echo json_encode(array("error" => "Невозможно расшарить фотографию (возможно, она уже расшарена)."), JSON_UNESCAPED_UNICODE);
     }
   } else {
-    function is_matches_search($str) {
-      if ($_GET['search'] === null) {
-        return true;
-      }
-  
-      $search_words = explode(' ', $_GET['search']);
-      $search_results = array_map(function($item) use ($str) {
-        return !empty($item) && strpos($str, $item) !== false;
-      }, $search_words);
-  
-      return in_array(true, $search_results);
-    }
-  
     $stmt = $user->read();
   
     $users_list = array();
@@ -69,7 +57,7 @@ if (empty($_SERVER['Authorization']) || $_SERVER['Authorization'] !== $_SESSION[
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
       extract($row);
   
-      if (!is_matches_search($first_name) && !is_matches_search($surname) && !is_matches_search($phone)) {
+      if (!is_matches_search($first_name, $_GET['search']) && !is_matches_search($surname, $_GET['search']) && !is_matches_search($phone, $_GET['search'])) {
         continue;
       }
   

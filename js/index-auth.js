@@ -14,6 +14,11 @@
 
   const photosWrapper = document.querySelector(".photos");
 
+  const searchPhotoInput = photosWrapper.querySelector(".photos__search");
+  const searchPhotoButton = photosWrapper.querySelector(
+    ".photos__search-button"
+  );
+
   const uploadPhotoModal = document.querySelector(".upload-photo");
   const uploadPhotoForm = uploadPhotoModal.querySelector(".upload-photo__form");
   const uploadPhotoFormErrors = uploadPhotoForm.querySelector(".errors");
@@ -61,6 +66,7 @@
 
   const authData = JSON.parse(localStorage.getItem("auth"));
   let currentPage = 1;
+  let showSharedByMePhotos = false;
 
   if (!authData) window.location.replace(SIGN_IN_URL);
 
@@ -161,11 +167,16 @@
 
     const renderUser = ({ first_name: firstName, surname, id }) => {
       const userElement = sharePhotoUserTemplate.content.cloneNode(true);
+      const userRadio = userElement.querySelector(".share-modal__user-radio");
+      const userName = userElement.querySelector(".share-modal__user-name");
 
-      userElement.querySelector(".share-modal__user-radio").value = id;
-      userElement.querySelector(
-        ".share-modal__user-name"
-      ).textContent = `${firstName} ${surname}`;
+      const uniqueId = `user_${id}`;
+
+      userRadio.value = id;
+      userRadio.id = uniqueId;
+
+      userName.textContent = `${firstName} ${surname}`;
+      userName.setAttribute("for", uniqueId);
 
       return userElement;
     };
@@ -188,12 +199,15 @@
 
     const handleSharePhotoUserSearchButtonClick = async () => {
       const search = sharePhotoUserSearchInput.value;
-      const response = await fetch(`${USERS_URL}/?search=${search}`, {
-        method: "GET",
-        headers: {
-          ["Authorization"]: authData.token,
-        },
-      });
+      const response = await fetch(
+        `${USERS_URL}${search ? `/?search=${search}` : ""}`,
+        {
+          method: "GET",
+          headers: {
+            ["Authorization"]: authData.token,
+          },
+        }
+      );
 
       const result = await response.json();
 
@@ -321,17 +335,18 @@
   const handlePaginationItemClick = (evt) => {
     evt.preventDefault();
 
+    const search = searchPhotoInput.value;
     currentPage = evt.target.dataset.id;
-    renderAllPhotos();
+    renderAllPhotos(search);
   };
 
-  const renderPagination = async (showShared = false) => {
+  const renderPagination = async (search = "") => {
     paginationWrapper.innerHTML = "";
 
     const response = await fetch(
       `${PHOTOS_URL}/?user_id=${authData.id}${
-        showShared ? "&show_shared=true" : ""
-      }`,
+        showSharedByMePhotos ? "&show_shared=true" : ""
+      }${search ? `&search=${search}` : ""}`,
       {
         method: "GET",
         headers: {
@@ -404,13 +419,13 @@
     return wrapper;
   };
 
-  const renderAllPhotos = async (showShared = false) => {
+  const renderAllPhotos = async (search = "") => {
     photosListWrapper.innerHTML = "";
 
     const response = await fetch(
       `${PHOTOS_URL}/?page=${currentPage}&user_id=${authData.id}${
-        showShared ? "&show_shared=true" : ""
-      }`,
+        showSharedByMePhotos ? "&show_shared=true" : ""
+      }${search ? `&search=${search}` : ""}`,
       {
         method: "GET",
         headers: {
@@ -436,13 +451,25 @@
   };
 
   const handleShowMyPhotosButtonClick = () => {
+    showSharedByMePhotos = false;
+
     renderAllPhotos();
     renderPagination();
   };
 
   const handleShowSharedByMePhotosButtonClick = () => {
-    renderAllPhotos(true);
-    renderPagination(true);
+    showSharedByMePhotos = true;
+
+    renderAllPhotos();
+    renderPagination();
+  };
+
+  const handleSearchPhotoButtonClick = () => {
+    const search = searchPhotoInput.value;
+
+    currentPage = 1;
+    renderAllPhotos(search);
+    renderPagination(search);
   };
 
   renderAllPhotos();
@@ -455,4 +482,5 @@
     "click",
     handleShowSharedByMePhotosButtonClick
   );
+  searchPhotoButton.addEventListener("click", handleSearchPhotoButtonClick);
 })();

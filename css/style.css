@@ -148,6 +148,11 @@ body {
   display: none;
 }
 
+.photos__search,
+.photos__search-button {
+  margin-bottom: 5px;
+}
+
 .photos__list {
   display: flex;
   justify-content: space-around;
